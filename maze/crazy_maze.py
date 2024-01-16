@@ -115,7 +115,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
                 current_line_index-1, current_line_index+1)
             # FIXED: LOGIC NEEDS to be fixed
             if rand_line == current_line_index:
-                if 
+                # TODO: Add an if statement to check if the block hasn't been used already.
                 wall_line = current_line_index+1
             elif rand_line == current_line_index or rand_line == current_line_index+1:
                 wall_line = current_line_index-1
