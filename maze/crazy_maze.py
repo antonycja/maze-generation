@@ -81,6 +81,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
     maze_route = []
     maze_wall_list = []
     visited_list = []
+    stack = []
 
     route = turtle.Turtle()
 
@@ -113,7 +114,8 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
             rand_line = random.randint(
                 current_line_index-1, current_line_index+1)
             # FIXED: LOGIC NEEDS to be fixed
-            if rand_line == current_line_index or rand_line == current_line_index-1:
+            if rand_line == current_line_index:
+                if 
                 wall_line = current_line_index+1
             elif rand_line == current_line_index or rand_line == current_line_index+1:
                 wall_line = current_line_index-1
@@ -124,29 +126,32 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
 
         for block in line_of_blocks:
             current_block_index = line_of_blocks.index(block)
-            
+
             """Generate random block index and Check to make sure that the position is valid."""
             if current_block_index == 0:
-                rand_block = random.randint(current_block_index, current_block_index+1)
+                rand_block = random.randint(
+                    current_block_index, current_block_index+1)
                 if rand_block == current_block_index:
                     wall_line = current_block_index+1
                 else:
-                    wall_line = rand_block
+                    wall_line = current_block_index
             elif current_block_index == horizontal_cells-1:
-                rand_block = random.randint(current_block_index-1, current_block_index)
+                rand_block = random.randint(
+                    current_block_index-1, current_block_index)
                 if rand_block == current_block_index:
                     wall_line = current_block_index-1
                 else:
-                    wall_line = rand_block
+                    wall_line = current_block_index
             else:
-                rand_block = random.randint(current_block_index-1, current_block_index+1)
+                rand_block = random.randint(
+                    current_block_index-1, current_block_index+1)
                 if rand_block == current_block_index-1 or rand_block == current_block_index:
                     wall_line = current_block_index-1
                 elif rand_block == current_block_index or rand_block == current_block_index-1:
                     wall_line = current_block_index+1
                 else:
                     wall_line = current_block_index
-            
+
             if current_line_index != rand_line:
                 """Move the Y(line) axis only"""
                 print("Moving The Line")
@@ -157,7 +162,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
                 print("Moving The Block")
                 path_pos = list_of_blocks[current_line_index][rand_block]
                 obs_pos = list_of_blocks[wall_line][rand_block]
-                
+
             if path_pos not in visited_list and path_pos not in maze_wall_list:
                 route.penup()
                 route.goto(path_pos[0])
@@ -181,8 +186,6 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
             else:
                 print("Already Used")
                 continue
-            
-                
 
     # for line in list_of_blocks:
     #     current_line = list_of_blocks.index(line)
