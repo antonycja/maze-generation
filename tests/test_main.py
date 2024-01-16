@@ -72,31 +72,37 @@ There are some obstacles:
         self.assertTrue(output.find('I am at the right edge') > -1)
 
     def test_unittest_robot_exist(self):
-        import test_robot 
-        self.assertTrue('test_robot' in sys.modules, "test_robot module should be found")
+        import test_robot
+        self.assertTrue('test_robot' in sys.modules,
+                        "test_robot module should be found")
 
     def test_unittest_robot_succeeds(self):
         import test_robot
         test_result = run_unittests("test_robot")
-        self.assertTrue(test_result.wasSuccessful(), "unit tests should succeed")
+        self.assertTrue(test_result.wasSuccessful(),
+                        "unit tests should succeed")
 
     def test_unittest_world_exist(self):
-        import test_world 
-        self.assertTrue('test_world' in sys.modules, "test_world module should be found")
+        import test_world
+        self.assertTrue('test_world' in sys.modules,
+                        "test_world module should be found")
 
     def test_unittest_world_succeeds(self):
         import test_world
         test_result = run_unittests("test_world")
-        self.assertTrue(test_result.wasSuccessful(), "unit tests should succeed")
+        self.assertTrue(test_result.wasSuccessful(),
+                        "unit tests should succeed")
 
     def test_unittest_obstacles_exist(self):
-        import test_obstacles 
-        self.assertTrue('test_obstacles' in sys.modules, "test_obstacles module should be found")
+        import test_obstacles
+        self.assertTrue('test_obstacles' in sys.modules,
+                        "test_obstacles module should be found")
 
     def test_unittest_succeeds(self):
         import test_obstacles
         test_result = run_unittests("test_obstacles")
-        self.assertTrue(test_result.wasSuccessful(), "unit tests should succeed")
+        self.assertTrue(test_result.wasSuccessful(),
+                        "unit tests should succeed")
 
 
 if __name__ == '__main__':
