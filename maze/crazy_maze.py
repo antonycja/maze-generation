@@ -4,11 +4,11 @@ import random
 # min_x, min_y, max_x, max_y = random.choice([(
 #     -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200)])
 min_x, min_y, max_x, max_y = -100, -100, 100, 100
-print("box Size", (min_x, min_y, max_x, max_y))
+# print("box Size", (min_x, min_y, max_x, max_y))
 # cell_size = random.choice([10, 20, 25,])
 cell_size = random.choice([50])
 
-print("Cell size", cell_size)
+# print("Cell size", cell_size)
 
 
 def draw_constraint_box(min_x, min_y, max_x, max_y):
@@ -25,7 +25,6 @@ def draw_constraint_box(min_x, min_y, max_x, max_y):
     tim.right(90)
     tim.goto(min_x, max_y)
 
-    print("Hello")
     pass
 
 
@@ -33,7 +32,7 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
     turtle_name.begin_poly()
     turtle_name.pencolor(pen_color)
     turtle_name.fillcolor(color)
-    turtle_name.pen(shown=True, pencolor=pen_color, fillcolor=color, speed=0)
+    turtle_name.pen(shown=True, pencolor=pen_color, fillcolor=color, speed=1)
     turtle_name.begin_fill()
     for _ in range(4):
         turtle_name.forward(cell_size)
@@ -49,6 +48,7 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     print("Vertical", vertical_cells)
     print("Horizontal", horizontal_cells)
     t = turtle.Turtle()
+    t.speed(1)
     t.getscreen().tracer(0)
     t.penup()
     t.goto(min_x, max_y)
@@ -74,189 +74,179 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
 
     pass
 
+def choose_random_move_index(current_index, cells):
+    if current_index == 0:
+        random_index = random.randint(current_index, current_index+1)
+    elif current_index == cells-1:
+        random_index = random.randint(current_index-1, current_index)
+    else:
+        random_index = random.randint(current_index-1, current_index+1)
+        
+    return random_index        
+        
+def is_maze_position_valid(position, visited_list):
+    if position not in visited_list: # The position has not changed
+        return True
+    else:
+        return False
+        pass
+    
+    pass
 
 def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
-    vertical_cells = int((-min_x + max_x) / cell_size)
-    horizontal_cells = int((-min_y + max_y) / cell_size)
+    horizontal_cells = int((-min_x + max_x) / cell_size)
+    vertical_cells = int((-min_y + max_y) / cell_size)
     maze_route = []
     maze_wall_list = []
     visited_list = []
     stack = []
 
     route = turtle.Turtle()
+    route.speed(1)
 
     wall = turtle.Turtle()
-
+    wall.speed(1)
     route.pen(pencolor="green", pendown=False, fillcolor="white")
     wall.penup()
+    wall.goto(min_x, max_y)
 
     route.goto(min_x, max_y)
     route.pendown()
-
+    
     for line_of_blocks in list_of_blocks:
         current_line_index = list_of_blocks.index(line_of_blocks)
-        """Get a random line index and Check to make sure that the position is valid."""
-        if current_line_index == 0:
-            rand_line = random.randint(
-                current_line_index, current_line_index+1)
-            if rand_line == current_line_index:
-                wall_line = current_line_index+1
-            else:
-                wall_line = current_line_index
-        elif current_line_index == (vertical_cells-1):
-            rand_line = random.randint(
-                current_line_index-1, current_line_index)
-            if rand_line == current_line_index:
-                wall_line = current_line_index-1
-            else:
-                wall_line = current_line_index
-        else:
-            rand_line = random.randint(
-                current_line_index-1, current_line_index+1)
-            # FIXED: LOGIC NEEDS to be fixed
-            if rand_line == current_line_index:
-                # TODO: Add an if statement to check if the block hasn't been used already.
-                wall_line = current_line_index+1
-            elif rand_line == current_line_index or rand_line == current_line_index+1:
-                wall_line = current_line_index-1
-            else:
-                wall_line = current_line_index
-
-        # print(rand_line)
+        random_y_index = choose_random_move_index(current_line_index, vertical_cells)
 
         for block in line_of_blocks:
             current_block_index = line_of_blocks.index(block)
-
-            """Generate random block index and Check to make sure that the position is valid."""
-            if current_block_index == 0:
-                rand_block = random.randint(
-                    current_block_index, current_block_index+1)
-                if rand_block == current_block_index:
-                    wall_line = current_block_index+1
-                else:
-                    wall_line = current_block_index
-            elif current_block_index == horizontal_cells-1:
-                rand_block = random.randint(
-                    current_block_index-1, current_block_index)
-                if rand_block == current_block_index:
-                    wall_line = current_block_index-1
-                else:
-                    wall_line = current_block_index
-            else:
-                rand_block = random.randint(
-                    current_block_index-1, current_block_index+1)
-                if rand_block == current_block_index-1 or rand_block == current_block_index:
-                    wall_line = current_block_index-1
-                elif rand_block == current_block_index or rand_block == current_block_index-1:
-                    wall_line = current_block_index+1
-                else:
-                    wall_line = current_block_index
-
-            if current_line_index != rand_line:
-                """Move the Y(line) axis only"""
-                print("Moving The Line")
-                path_pos = list_of_blocks[rand_line][current_block_index]
-                obs_pos = list_of_blocks[wall_line][current_block_index]
-            else:
-                """Move the block in the (X) axis"""
-                print("Moving The Block")
-                path_pos = list_of_blocks[current_line_index][rand_block]
-                obs_pos = list_of_blocks[wall_line][rand_block]
-
-            if path_pos not in visited_list and path_pos not in maze_wall_list:
-                route.penup()
-                route.goto(path_pos[0])
-                route.pendown()
-                draw_square(cell_size, route, "white", "black")
-                if obs_pos in visited_list or obs_pos in maze_wall_list:
-                    continue
-                else:
-                    wall.goto(obs_pos[0])
-                    wall.pendown()
-                    draw_square(cell_size, wall, "blue", "red")
-                    wall.penup()
-                    maze_wall_list.append(obs_pos)
-                    visited_list.append(obs_pos)
-                    print("Drawing Wall")
-
-                print("Drawing Path")
-                visited_list.append(path_pos)
-
-                # list_of_blocks[rand_line].pop(current_block_index)
-            else:
-                print("Already Used")
-                continue
-
-    # for line in list_of_blocks:
-    #     current_line = list_of_blocks.index(line)
-    #     if current_line == 0:
-    #         random_line = random.randint(current_line, current_line+1)
-    #     elif current_line == cell_size:
-    #         random_line = random.randint(current_line-1, current_line)
+            random_x_index = choose_random_move_index(current_block_index, horizontal_cells)
+            
+            """Start checking """
+            
+            if current_line_index != random_y_index:
+                position = list_of_blocks[random_y_index][current_block_index]
+                if is_maze_position_valid(position, visited_list):
+                    visited_list.append(position)
+                    stack.append(position)
+                    print("From (Y): ", list_of_blocks[current_line_index][current_block_index])
+                    print("To (Y): ", position)
+                
+                pass
+                # 
+            print("Random Y:", random_y_index)
+            
+            
+            
+    # for line_of_blocks in list_of_blocks:
+    #     current_line_index = list_of_blocks.index(line_of_blocks)
+    #     """Get a random line index and Check to make sure that the position is valid."""
+    #     if current_line_index == 0:
+    #         rand_line = random.randint(
+    #             current_line_index, current_line_index+1)
+    #         if rand_line == current_line_index:
+    #             wall_line = current_line_index+1
+    #         else:
+    #             wall_line = current_line_index
+    #     elif current_line_index == (vertical_cells-1):
+    #         rand_line = random.randint(
+    #             current_line_index-1, current_line_index)
+    #         if rand_line == current_line_index:
+    #             wall_line = current_line_index-1
+    #         else:
+    #             wall_line = current_line_index
     #     else:
-    #         random_line = random.randint(current_line-1, current_line+1)
+    #         rand_line = random.randint(
+    #             current_line_index-1, current_line_index+1)
+    #         # FIXED: LOGIC NEEDS to be fixed
+    #         if rand_line == current_line_index-1:
+    #             # TODO: Add an if statement to check if the block hasn't been used already.
+    #             if current_line_index+1 in visited_list:
+    #                 wall_line = current_line_index+1
+    #             else:
+    #                 wall_line = current_line_index
 
-    #         pass
-    #     print(f"""Outer For LOOP:
-    #             Current Line: {current_line}
-    #             Random Line: {random_line}
-    #             """)
-    #     for block in line:
-    #         current_block = line.index(block)
-    #         if current_block == 0:
-    #             random_block = random.randint(current_block, current_block+1)
-    #             print(f"Random Block: {current_block}, {current_block+1}")
-
-    #         elif current_block == cell_size:
-    #             random_block = random.randint(current_block-1, current_block)
-    #             print(
-    #                 f"Random Block between: {current_block-1}, {current_block}")
-
+    #         elif rand_line == current_line_index+1:
+    #             if current_line_index-1 in visited_list:
+    #                 wall_line = current_line_index-1
+    #             else:
+    #                 wall_line = current_line_index
     #         else:
-    #             random_block = random.randint(current_block-1, current_block+1)
-    #             print(
-    #                 f"Random Block between: {current_block-1}, {current_block+1}")
-    #         # random_block = random.randint(current_block, current_block+1)
+    #             wall_line = current_line_index
 
-    #         print(f"""Inner For LOOP:
-    #               Current Block: {current_block}
-    #               Random Block: {random_block}
-    #               """)
+    #     # print(rand_line)
 
-    #         # if the line has changed, we should not get a random block
+    #     for block in line_of_blocks:
+    #         current_block_index = line_of_blocks.index(block)
 
-    #         if random_line == current_line and random_line != random_block:
-    #             # Move to that line
-    #             route.penup()
-    #             line_to_go_to = list_of_blocks[current_line]
-    #             block_to_go_to = random_block
-    #             route.goto(line_to_go_to[block_to_go_to][0])
-    #             route.pendown()
-    #             draw_square(cell_size, route, "white", "green")
-    #         elif random_line != current_line:
-    #             route.penup()
-    #             line_to_go_to = list_of_blocks[random_line]
-    #             block_to_go_to = current_block
-    #             route.goto(line_to_go_to[block_to_go_to][0])
-    #             route.pendown()
-    #             draw_square(cell_size, route, "white", "green")
+    #         """Generate random block index and Check to make sure that the position is valid."""
+    #         if current_block_index == 0:
+    #             rand_block = random.randint(
+    #                 current_block_index, current_block_index+1)
+    #             if rand_block == current_block_index:
+    #                 wall_line = current_block_index+1
+    #             else:
+    #                 wall_line = current_block_index
+    #         elif current_block_index == horizontal_cells-1:
+    #             rand_block = random.randint(
+    #                 current_block_index-1, current_block_index)
+    #             if rand_block == current_block_index:
+    #                 wall_line = current_block_index-1
+    #             else:
+    #                 wall_line = current_block_index
     #         else:
+    #             rand_block = random.randint(
+    #                 current_block_index-1, current_block_index+1)
+    #             if rand_line == current_block_index-1:
+    #             # TODO: Add an if statement to check if the block hasn't been used already.
+    #                 if current_block_index+1 in visited_list:
+    #                     wall_line = current_block_index+1
+    #                 else:
+    #                     wall_line = current_block_index
+
+    #             elif rand_line == current_block_index+1:
+    #                 if current_block_index-1 in visited_list:
+    #                     wall_line = current_block_index-1
+    #                 else:
+    #                     wall_line = current_block_index
+    #             else:
+    #                 wall_line = current_block_index
+
+    #         if current_line_index != rand_line:
+    #             """Move the Y(line) axis only"""
+    #             print("Moving The Line")
+    #             path_pos = list_of_blocks[rand_line][current_block_index]
+    #             obs_pos = list_of_blocks[wall_line][current_block_index]
+    #         else:
+    #             """Move the block in the (X) axis"""
+    #             print("Moving The Block")
+    #             path_pos = list_of_blocks[current_line_index][rand_block]
+    #             obs_pos = list_of_blocks[wall_line][rand_block]
+
+    #         if path_pos not in visited_list and path_pos not in maze_wall_list:
     #             route.penup()
-    #             line_to_go_to = list_of_blocks[random_line]
-    #             block_to_go_to = current_block
-    #             route.goto(line_to_go_to[block_to_go_to][0])
+    #             route.goto(path_pos[0])
     #             route.pendown()
-    #             draw_square(cell_size, route, "gray", "red")
+    #             draw_square(cell_size, route, "white", "black")
+    #             if obs_pos in visited_list or obs_pos in maze_wall_list:
+    #                 continue
+    #             else:
+    #                 wall.goto(obs_pos[0])
+    #                 wall.pendown()
+    #                 draw_square(cell_size, wall, "blue", "red")
+    #                 wall.penup()
+    #                 maze_wall_list.append(obs_pos)
+    #                 visited_list.append(obs_pos)
+    #                 print("Drawing Wall")
 
-    #         # [print(f"{block}\n") for block in line_to_go_to]
-    #         print(line_to_go_to)
-            # print(list_of_blocks[line_to_go_to].index(line_to_go_to[block_to_go_to][0]))
-            # list_of_blocks.pop(list_of_blocks.index(block_to_go_to))
+    #             print("Drawing Path")
+    #             visited_list.append(path_pos)
 
-    # print(list_of_blocks[1][0][0])
-    # options = {"forward_right": (
-    #     list_of_blocks[0][0]+horizontal_cells), "up": (list_of_blocks[0][0]+1), "back_left": (list_of_blocks[0][0]-1), "down": list_of_blocks[0][0]-horizontal_cells}
+    #             # list_of_blocks[rand_line].pop(current_block_index)
+    #         else:
+    #             print("Already Used")
+    #             continue
 
+   
 
 def check_right():
     pass
