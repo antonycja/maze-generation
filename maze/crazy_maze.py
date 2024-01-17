@@ -39,12 +39,14 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
         turtle_name.right(90)
     turtle_name.end_fill()
     turtle_name.end_poly()
+    turtle_name.penup()
     return turtle_name.get_poly()
     pass
 
 
 def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_cells):
     list_of_blocks = []
+    list_of_all_boxes_1d = []
     print("Vertical", vertical_cells)
     print("Horizontal", horizontal_cells)
     t = turtle.Turtle()
@@ -58,6 +60,7 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
         list_vertical_squares = []
         for vertical in range(vertical_cells):
             list_of_squares = draw_square(cell_size, turtle_name=t)
+            list_of_all_boxes_1d.append(list_of_squares)
             list_vertical_squares.append(list_of_squares)
             t.forward(cell_size)
             pass
@@ -67,33 +70,85 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
         t.left(90)
         t.back(vertical_cells*cell_size)
     t.getscreen().tracer(1)
+
+    print(list_of_all_boxes_1d)
     # [print(index, " -", box) for index, box in enumerate(list_of_blocks)]
     # print(len(list_of_blocks)*len(list_of_blocks[0]))
     # [print(block) for block in list_of_blocks]
-    return list_of_blocks
+    return list_of_blocks, list_of_all_boxes_1d
 
     pass
 
-def choose_random_move_index(current_index, cells):
+
+def choose_random_move_index(current_index, x_cells, y_cells):
+    # print(current_index + x_cells)
     if current_index == 0:
-        random_index = random.randint(current_index, current_index+1)
-    elif current_index == cells-1:
-        random_index = random.randint(current_index-1, current_index)
+        down = current_index + x_cells
+        right = current_index+1
+        random_index = random.choice([down, right])
+        wall_index = down if random_index == right else right
+        pass
+
+    elif current_index % x_cells == 0:
+        down = current_index + x_cells
+        up = current_index - x_cells
+        right = current_index+1
+        random_index = random.choice([up, down, right])
+        wall_index = down if random_index == up or random_index == right else up if random_index == right or random_index == down else right
+
+    elif current_index < x_cells:
+        down = current_index + x_cells
+        left = right = current_index-1
+        right = current_index+1
+        random_index = random.choice([left, down, right])
+        wall_index = down if random_index == left or random_index == right else left if random_index == right or random_index == down else right
+        pass
+
+    elif current_index > (x_cells*y_cells) - x_cells:
+        up = current_index - x_cells
+        left = right = current_index-1
+        right = current_index+1
+        random_index = random.choice([up, left, right])
+        wall_index = up if random_index == left or random_index == right else left if random_index == right or random_index == up else right
+        pass
+
     else:
-        random_index = random.randint(current_index-1, current_index+1)
-        
-    return random_index        
-        
+        # try:
+        up = current_index - x_cells
+        down = current_index + x_cells
+        left = right = current_index-1
+        right = current_index+1
+        random_index = random.choice([up, down, right, left])
+        wall_index = up if random_index != up else down if random_index != down else right if random_index != right else left
+
+    return random_index, wall_index
+
+    # if current_index == 0:
+    #     random_index = random.randint(current_index, current_index+1)
+    #     wall_index = int(
+    #         f"{current_index+1 if random_index == current_index else current_index+1}")
+    # elif current_index == cells-1:
+    #     random_index = random.randint(current_index-1, current_index)
+    #     wall_index = int(
+    #         f"{current_index-1 if random_index == current_index else current_index-1}")
+    # else:
+    #     random_index = random.randint(current_index-1, current_index+1)
+    #     wall_index = int(f"{current_index+1 if random_index == current_index or random_index == current_index-1 else current_index-1 if random_index == current_index or random_index == current_index+1 else current_index}")
+
+    # return random_index, wall_index
+
+
 def is_maze_position_valid(position, visited_list):
-    if position not in visited_list: # The position has not changed
+    if position not in visited_list:  # The position has not changed
         return True
     else:
         return False
         pass
-    
+
     pass
 
-def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
+
+def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, list_of_all_boxes_1d):
     horizontal_cells = int((-min_x + max_x) / cell_size)
     vertical_cells = int((-min_y + max_y) / cell_size)
     maze_route = []
@@ -112,31 +167,34 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
 
     route.goto(min_x, max_y)
     route.pendown()
-    
-    for line_of_blocks in list_of_blocks:
-        current_line_index = list_of_blocks.index(line_of_blocks)
-        random_y_index = choose_random_move_index(current_line_index, vertical_cells)
 
-        for block in line_of_blocks:
-            current_block_index = line_of_blocks.index(block)
-            random_x_index = choose_random_move_index(current_block_index, horizontal_cells)
-            
-            """Start checking """
-            
-            if current_line_index != random_y_index:
-                position = list_of_blocks[random_y_index][current_block_index]
-                if is_maze_position_valid(position, visited_list):
-                    visited_list.append(position)
-                    stack.append(position)
-                    print("From (Y): ", list_of_blocks[current_line_index][current_block_index])
-                    print("To (Y): ", position)
-                
-                pass
-                # 
-            print("Random Y:", random_y_index)
-            
-            
-            
+    current_index = 0
+    while len(visited_list) != (len(list_of_all_boxes_1d)):
+
+        random_index, wall_index = choose_random_move_index(
+            current_index, horizontal_cells, vertical_cells)
+
+        current_index = random_index
+        current_wall_index = wall_index
+
+        if current_index not in visited_list and current_wall_index not in visited_list and current_index < len(list_of_all_boxes_1d):
+            visited_list.append(current_index)
+            maze_route.append(current_index)
+            visited_list.append(current_wall_index)
+            maze_wall_list.append(current_wall_index)
+            # route.goto(list_of_all_boxes_1d[current_index][0])
+            # draw_square(cell_size, route, "white", "green")
+            # wall.goto(list_of_all_boxes_1d[current_wall_index][0])
+            # draw_square(cell_size, wall, "red", "black")
+
+    print("Wall List: ", maze_wall_list)
+    print()
+    print("Path List: ", maze_route)
+    print()
+    print("Visited List: ", sorted(visited_list))
+    # if current_index == len(list_of_all_boxes_1d):
+    #     break
+
     # for line_of_blocks in list_of_blocks:
     #     current_line_index = list_of_blocks.index(line_of_blocks)
     #     """Get a random line index and Check to make sure that the position is valid."""
@@ -246,7 +304,6 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks):
     #             print("Already Used")
     #             continue
 
-   
 
 def check_right():
     pass
@@ -257,9 +314,10 @@ def run_maze():
     horizontal_cells = int((-min_y + max_y) / cell_size)
     screen = turtle.Screen()
     draw_constraint_box(min_x, min_y, max_x, max_y)
-    list_of_blocks = fill_in_constraints_box(
+    list_of_blocks, list_of_all_boxes_1d = fill_in_constraints_box(
         cell_size, min_x, max_y, vertical_cells, horizontal_cells)
-    create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks)
+    create_maze_route(cell_size, min_x, min_y, max_x, max_y,
+                      list_of_blocks, list_of_all_boxes_1d)
 
     screen.exitonclick()
 
