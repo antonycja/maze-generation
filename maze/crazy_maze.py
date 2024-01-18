@@ -72,6 +72,7 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     t.getscreen().tracer(1)
 
     print(list_of_all_boxes_1d)
+    print(len(list_of_all_boxes_1d))
     # [print(index, " -", box) for index, box in enumerate(list_of_blocks)]
     # print(len(list_of_blocks)*len(list_of_blocks[0]))
     # [print(block) for block in list_of_blocks]
@@ -82,35 +83,82 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
 
 def choose_random_move_index(current_index, x_cells, y_cells):
     # print(current_index + x_cells)
+    len_of_obs = (x_cells*y_cells)
+
+    # Check the first index, and choose an index to place the wall.
     if current_index == 0:
         down = current_index + x_cells
         right = current_index+1
-        random_index = random.choice([down, right])
-        wall_index = down if random_index == right else right
-        pass
+        list_of_directions = [down, right]
 
-    elif current_index % x_cells == 0:
-        down = current_index + x_cells
-        up = current_index - x_cells
-        right = current_index+1
-        random_index = random.choice([up, down, right])
-        wall_index = down if random_index == up or random_index == right else up if random_index == right or random_index == down else right
+        random_index = random.choice(list_of_directions)
+        list_of_directions.remove(random_index)
+        wall_index = random.choice(list_of_directions)
 
+    # Check if the current row is the last row and
+    elif (current_index+1) % x_cells == 0 and (current_index+1) < len_of_obs:
+        # Check if its on the first line
+        if (current_index+1) - x_cells == 0:
+            down = current_index + x_cells
+            left = current_index - 1
+            list_of_directions = [down, left]
+
+        # Check if the current index is the last index
+        elif (current_index) == len_of_obs-1:
+            up = current_index - x_cells
+            left = current_index - 1
+            list_of_directions = [up, left]
+
+        # Do the indexes in between
+        else:
+            up = current_index - x_cells
+            down = current_index + x_cells
+            left = current_index - 1
+            list_of_directions = [up, down, left]
+
+        random_index = random.choice(list_of_directions)
+        list_of_directions.remove(random_index)
+        wall_index = random.choice(list_of_directions)
+
+    # Check the first row and choose a random index for the robot to go to.
     elif current_index < x_cells:
         down = current_index + x_cells
         left = right = current_index-1
         right = current_index+1
-        random_index = random.choice([left, down, right])
-        wall_index = down if random_index == left or random_index == right else left if random_index == right or random_index == down else right
-        pass
+        list_of_directions = [left, right, down]
 
-    elif current_index > (x_cells*y_cells) - x_cells:
+        random_index = random.choice(list_of_directions)
+        list_of_directions.remove(random_index)
+        wall_index = random.choice(list_of_directions)
+
+    # Check the first row which will always be divisible by the x_cells
+    elif current_index % x_cells == 0:
+
+        # Check if that current index is not in the last line
+        if (len_of_obs - x_cells) == current_index:
+            up = current_index - x_cells
+            right = current_index + 1
+            list_of_directions = [up, right]
+        else:
+            down = current_index + x_cells
+            up = current_index - x_cells
+            right = current_index+1
+            list_of_directions = [up, down, right]
+
+        random_index = random.choice(list_of_directions)
+        list_of_directions.remove(random_index)
+        wall_index = random.choice(list_of_directions)
+
+    # Check if the current index is in the last row
+    elif current_index > (len_of_obs) - x_cells:
         up = current_index - x_cells
         left = right = current_index-1
         right = current_index+1
-        random_index = random.choice([up, left, right])
-        wall_index = up if random_index == left or random_index == right else left if random_index == right or random_index == up else right
-        pass
+        list_of_directions = [up, left, right]
+
+        random_index = random.choice(list_of_directions)
+        list_of_directions.remove(random_index)
+        wall_index = random.choice(list_of_directions)
 
     else:
         # try:
@@ -118,24 +166,13 @@ def choose_random_move_index(current_index, x_cells, y_cells):
         down = current_index + x_cells
         left = right = current_index-1
         right = current_index+1
-        random_index = random.choice([up, down, right, left])
-        wall_index = up if random_index != up else down if random_index != down else right if random_index != right else left
+        list_of_directions = [up, down, left, right]
+
+        random_index = random.choice(list_of_directions)
+        list_of_directions.remove(random_index)
+        wall_index = random.choice(list_of_directions)
 
     return random_index, wall_index
-
-    # if current_index == 0:
-    #     random_index = random.randint(current_index, current_index+1)
-    #     wall_index = int(
-    #         f"{current_index+1 if random_index == current_index else current_index+1}")
-    # elif current_index == cells-1:
-    #     random_index = random.randint(current_index-1, current_index)
-    #     wall_index = int(
-    #         f"{current_index-1 if random_index == current_index else current_index-1}")
-    # else:
-    #     random_index = random.randint(current_index-1, current_index+1)
-    #     wall_index = int(f"{current_index+1 if random_index == current_index or random_index == current_index-1 else current_index-1 if random_index == current_index or random_index == current_index+1 else current_index}")
-
-    # return random_index, wall_index
 
 
 def is_maze_position_valid(position, visited_list):
@@ -151,9 +188,9 @@ def is_maze_position_valid(position, visited_list):
 def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, list_of_all_boxes_1d):
     horizontal_cells = int((-min_x + max_x) / cell_size)
     vertical_cells = int((-min_y + max_y) / cell_size)
-    maze_route = []
+    maze_route = [0]
     maze_wall_list = []
-    visited_list = []
+    visited_list = [0]
     stack = []
 
     route = turtle.Turtle()
@@ -168,11 +205,22 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
     route.goto(min_x, max_y)
     route.pendown()
 
+    draw_square(cell_size, route, "white", "green")
+
     current_index = 0
+
     while len(visited_list) != (len(list_of_all_boxes_1d)):
 
         random_index, wall_index = choose_random_move_index(
             current_index, horizontal_cells, vertical_cells)
+
+        # if random_index == len(list_of_all_boxes_1d):
+        #     current_index == random_index-1
+        # else: current_index = random_index
+        # if wall_index == len(list_of_all_boxes_1d):
+        #     current_wall_index = wall_index-1
+        # else:
+        # current_wall_index = wall_index
 
         current_index = random_index
         current_wall_index = wall_index
@@ -192,6 +240,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
     print("Path List: ", maze_route)
     print()
     print("Visited List: ", sorted(visited_list))
+
     # if current_index == len(list_of_all_boxes_1d):
     #     break
 
