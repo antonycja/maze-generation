@@ -81,7 +81,7 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     pass
 
 
-def choose_random_move_index(current_index, x_cells, y_cells):
+def choose_random_move_index(current_index, x_cells, y_cells, visited_list):
     # print(current_index + x_cells)
     len_of_obs = (x_cells*y_cells)
 
@@ -90,10 +90,6 @@ def choose_random_move_index(current_index, x_cells, y_cells):
         down = current_index + x_cells
         right = current_index+1
         list_of_directions = [down, right]
-
-        random_index = random.choice(list_of_directions)
-        list_of_directions.remove(random_index)
-        wall_index = random.choice(list_of_directions)
 
     # Check if the current row is the last row and
     elif (current_index+1) % x_cells == 0 and (current_index+1) < len_of_obs:
@@ -116,20 +112,12 @@ def choose_random_move_index(current_index, x_cells, y_cells):
             left = current_index - 1
             list_of_directions = [up, down, left]
 
-        random_index = random.choice(list_of_directions)
-        list_of_directions.remove(random_index)
-        wall_index = random.choice(list_of_directions)
-
     # Check the first row and choose a random index for the robot to go to.
     elif current_index < x_cells:
         down = current_index + x_cells
         left = right = current_index-1
         right = current_index+1
         list_of_directions = [left, right, down]
-
-        random_index = random.choice(list_of_directions)
-        list_of_directions.remove(random_index)
-        wall_index = random.choice(list_of_directions)
 
     # Check the first row which will always be divisible by the x_cells
     elif current_index % x_cells == 0:
@@ -145,10 +133,6 @@ def choose_random_move_index(current_index, x_cells, y_cells):
             right = current_index+1
             list_of_directions = [up, down, right]
 
-        random_index = random.choice(list_of_directions)
-        list_of_directions.remove(random_index)
-        wall_index = random.choice(list_of_directions)
-
     # Check if the current index is in the last row
     elif current_index > (len_of_obs) - x_cells:
         up = current_index - x_cells
@@ -156,21 +140,32 @@ def choose_random_move_index(current_index, x_cells, y_cells):
         right = current_index+1
         list_of_directions = [up, left, right]
 
-        random_index = random.choice(list_of_directions)
-        list_of_directions.remove(random_index)
-        wall_index = random.choice(list_of_directions)
-
     else:
-        # try:
+        # All the other options left which is the middle blocks
         up = current_index - x_cells
         down = current_index + x_cells
-        left = right = current_index-1
+        left = current_index-1
         right = current_index+1
         list_of_directions = [up, down, left, right]
 
+    while True:
         random_index = random.choice(list_of_directions)
-        list_of_directions.remove(random_index)
-        wall_index = random.choice(list_of_directions)
+        if random_index not in visited_list:
+            list_of_directions.remove(random_index)
+            while True:
+                wall_index = random.choice(list_of_directions)
+                if wall_index not in visited_list:
+                    break
+                list_of_directions.remove(wall_index)
+                if len(list_of_directions) == 0:
+                    wall_index = None
+                    break
+
+            # indexes.append(random_index)
+            # indexes.append(wall_index)
+            break
+        else:
+            pass
 
     return random_index, wall_index
 
@@ -205,14 +200,14 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
     route.goto(min_x, max_y)
     route.pendown()
 
-    draw_square(cell_size, route, "white", "green")
+    draw_square(cell_size, route, "green", "black")
 
     current_index = 0
 
-    while len(visited_list) != (len(list_of_all_boxes_1d)):
+    while len(visited_list) < (len(list_of_all_boxes_1d)):
 
         random_index, wall_index = choose_random_move_index(
-            current_index, horizontal_cells, vertical_cells)
+            current_index, horizontal_cells, vertical_cells, visited_list)
 
         # if random_index == len(list_of_all_boxes_1d):
         #     current_index == random_index-1
@@ -225,15 +220,17 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
         current_index = random_index
         current_wall_index = wall_index
 
-        if current_index not in visited_list and current_wall_index not in visited_list and current_index < len(list_of_all_boxes_1d):
-            visited_list.append(current_index)
-            maze_route.append(current_index)
-            visited_list.append(current_wall_index)
-            maze_wall_list.append(current_wall_index)
-            # route.goto(list_of_all_boxes_1d[current_index][0])
-            # draw_square(cell_size, route, "white", "green")
-            # wall.goto(list_of_all_boxes_1d[current_wall_index][0])
-            # draw_square(cell_size, wall, "red", "black")
+        if current_index not in visited_list and current_wall_index not in visited_list or current_wall_index == None and current_index < len(list_of_all_boxes_1d):
+            if current_index != None and current_index < len(list_of_all_boxes_1d):
+                visited_list.append(current_index)
+                maze_route.append(current_index)
+                route.goto(list_of_all_boxes_1d[current_index][0])
+                draw_square(cell_size, route, "green", "black")
+            if current_wall_index != None and current_wall_index < len(list_of_all_boxes_1d):
+                visited_list.append(current_wall_index)
+                maze_wall_list.append(current_wall_index)
+                wall.goto(list_of_all_boxes_1d[current_wall_index][0])
+                draw_square(cell_size, wall, "red", "black")
 
     print("Wall List: ", maze_wall_list)
     print()
