@@ -151,6 +151,7 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
         list_of_directions = [up, down, left, right]
 
     in_visited = []
+    #  check every possible direction to see if its not already visited.
     for direction in list_of_directions:
         if direction in visited_list:
             in_visited.append(True)
@@ -160,11 +161,14 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
     while True:
         random_index = random.choice(list_of_directions)
         if random_index not in visited_list:
+            # Check if the chosen random number is not already visited and remove it from the list if it was visited.
             list_of_directions.remove(random_index)
             while True:
+                # choose a random direction to place the wall and check if its not visited already.
                 wall_index = random.choice(list_of_directions)
                 if wall_index not in visited_list:
                     break
+                # if visited remove and repeat.
                 list_of_directions.remove(wall_index)
                 if len(list_of_directions) == 0:
                     wall_index = None
@@ -179,6 +183,7 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
                 wall_index = None
                 break
             elif len(stack) == 1:
+                # Check is the stack only have one value, if so then there are no more possible routes start placing walls where there isn't
                 random_index = None
                 for i in range(0, len_of_obs):
                     if i not in visited_list:
@@ -210,7 +215,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
 
     route = turtle.Turtle()
     route.speed(0)
-    route.getscreen().tracer(10,5)
+    route.getscreen().tracer(10, 5)
     wall = turtle.Turtle()
     wall.getscreen().tracer(10, 5)
     wall.speed(0)
@@ -237,7 +242,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
             # check if the  there are no more places to go
             if len(stack) != 0:
                 pass
-
+            # Drawing the path
             if current_index != None and current_index < len(list_of_all_boxes_1d):
                 if current_index not in visited_list:
                     visited_list.append(current_index)
@@ -246,6 +251,8 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
                 maze_route.append(current_index)
                 route.goto(list_of_all_boxes_1d[current_index][0])
                 draw_square(cell_size, route, "green", "black")
+                
+            # Drawing the walls 
             if current_wall_index != None and current_wall_index < len(list_of_all_boxes_1d):
                 visited_list.append(current_wall_index)
 
