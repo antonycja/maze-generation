@@ -248,8 +248,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
                 draw_square(cell_size, route, "green", "black")
             if current_wall_index != None and current_wall_index < len(list_of_all_boxes_1d):
                 visited_list.append(current_wall_index)
-                # if current_wall_index not in visited_list:
-                #     stack.append(current_wall_index)
+
                 maze_wall_list.append(current_wall_index)
                 wall.goto(list_of_all_boxes_1d[current_wall_index][0])
                 draw_square(cell_size, wall, "red", "black")
