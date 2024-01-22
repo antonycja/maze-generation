@@ -1,18 +1,19 @@
 import turtle
 import random
 
-min_x, min_y, max_x, max_y = random.choice([(
-    -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
-# min_x, min_y, max_x, max_y = -100, -100, 100, 100
+# min_x, min_y, max_x, max_y = random.choice([(
+#     -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
+min_x, min_y, max_x, max_y = -100, -200, 100, 200
 print("box Size", (min_x, min_y, max_x, max_y))
-cell_size = random.choice([10, 20, 25,])
-# cell_size = random.choice([50])
+# cell_size = random.choice([10, 20, 25,])
+cell_size = random.choice([5])
 
 # print("Cell size", cell_size)
 
 
 def draw_constraint_box(min_x, min_y, max_x, max_y):
     tim = turtle.Turtle(visible=False)
+    tim.getscreen().tracer(1)
     tim.pen(speed=0, pendown=False)
     tim.goto(min_x, max_y)
     tim.pendown()
@@ -32,7 +33,7 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
     turtle_name.begin_poly()
     turtle_name.pencolor(pen_color)
     turtle_name.fillcolor(color)
-    turtle_name.pen(shown=True, pencolor=pen_color, fillcolor=color, speed=0)
+    turtle_name.pen(shown=False, pencolor=pen_color, fillcolor=color, speed=0)
     turtle_name.begin_fill()
     for _ in range(4):
         turtle_name.forward(cell_size)
@@ -44,12 +45,14 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
     pass
 
 # TODO: Clean up this function by removing code that is not being used anymore and write comments
+
+
 def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_cells):
     list_of_blocks = []
     list_of_all_boxes_1d = []
     print("Vertical", vertical_cells)
     print("Horizontal", horizontal_cells)
-    t = turtle.Turtle()
+    t = turtle.Turtle(visible=False)
     t.speed(0)
     t.getscreen().tracer(0)
     t.penup()
@@ -69,7 +72,7 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
         t.forward(cell_size)
         t.left(90)
         t.back(vertical_cells*cell_size)
-    t.getscreen().tracer(1)
+    # t.getscreen().tracer(1)
 
     print(list_of_all_boxes_1d)
     print(len(list_of_all_boxes_1d))
@@ -153,7 +156,7 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
             in_visited.append(True)
         elif direction < len_of_obs:
             in_visited.append(False)
-            
+
     while True:
         random_index = random.choice(list_of_directions)
         if random_index not in visited_list:
@@ -180,11 +183,10 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
                 for i in range(0, len_of_obs):
                     if i not in visited_list:
                         wall_index = i
-                        break   
+                        break
                 if wall_index:
                     break
-                  
-        
+
     return random_index, wall_index
 
 
@@ -208,8 +210,9 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
 
     route = turtle.Turtle()
     route.speed(0)
-
+    route.getscreen().tracer(10,5)
     wall = turtle.Turtle()
+    wall.getscreen().tracer(10, 5)
     wall.speed(0)
     route.pen(pencolor="green", pendown=False, fillcolor="white")
     wall.penup()
@@ -234,9 +237,9 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
             # check if the  there are no more places to go
             if len(stack) != 0:
                 pass
-            
+
             if current_index != None and current_index < len(list_of_all_boxes_1d):
-                if current_index not  in visited_list:
+                if current_index not in visited_list:
                     visited_list.append(current_index)
                 if current_index not in stack:
                     stack.append(current_index)
@@ -245,7 +248,8 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
                 draw_square(cell_size, route, "green", "black")
             if current_wall_index != None and current_wall_index < len(list_of_all_boxes_1d):
                 visited_list.append(current_wall_index)
-                # stack.append(current_wall_index)
+                # if current_wall_index not in visited_list:
+                #     stack.append(current_wall_index)
                 maze_wall_list.append(current_wall_index)
                 wall.goto(list_of_all_boxes_1d[current_wall_index][0])
                 draw_square(cell_size, wall, "red", "black")
