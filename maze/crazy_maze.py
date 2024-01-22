@@ -44,8 +44,32 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
     return turtle_name.get_poly()
     pass
 
-# TODO: Clean up this function by removing code that is not being used anymore and write comments
 
+def draw_starting_point():
+    starting = turtle.Turtle(visible=False)
+    starting.getscreen().tracer(0)
+    center_starting_pos = []
+    starting_y_point = ((cell_size/2)+cell_size)
+    for line in range(3):
+        starting_x_point = -((cell_size/2)+cell_size)
+        for row in range(3):
+            starting.begin_poly()
+            starting.goto(starting_x_point, starting_y_point)
+            draw_square(cell_size, starting, "blue", "blue")
+            starting_x_point += cell_size
+            starting.end_poly()
+            center_starting_pos.append(starting.get_poly())
+        # Drawing down
+        starting_y_point -= cell_size
+
+    print(
+        f"Center Starting point\n{len(center_starting_pos)}\n{center_starting_pos}")
+
+    # starting.goto(starting_x_point, starting_y_point)
+    # draw_square(cell_size, starting, "white", "black")
+
+
+# TODO: Clean up this function by removing code that is not being used anymore and write comments
 
 def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_cells):
     list_of_blocks = []
@@ -177,7 +201,8 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
         else:
             if all(in_visited) and len(stack) != 1:
                 # Do the stack reverse here
-                print("going back")
+
+                # print("going back")
                 stack.pop()
                 random_index = stack[-1]
                 wall_index = None
@@ -193,23 +218,6 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
                     break
 
     return random_index, wall_index
-
-
-def draw_starting_point():
-    starting = turtle.Turtle(visible=False)
-    starting.getscreen().tracer(0)
-
-    starting_y_point = ((cell_size/2)+cell_size)
-    for line in range(3):
-        starting_x_point = -((cell_size/2)+cell_size)
-        for row in range(3):
-            starting.goto(starting_x_point, starting_y_point)
-            draw_square(cell_size, starting, "blue", "blue")
-            starting_x_point += cell_size
-        # Drawing down
-        starting_y_point -= cell_size
-        # starting.goto(starting_x_point, starting_y_point)
-        # draw_square(cell_size, starting, "white", "black")
 
 
 def is_maze_position_valid(position, visited_list):
@@ -253,7 +261,6 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
     route.goto(min_x, max_y)
     route.pendown()
 
-    
     draw_square(cell_size, route, "green", "black")
 
     current_index = 0
@@ -288,13 +295,13 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
                 wall.goto(list_of_all_boxes_1d[current_wall_index][0])
                 draw_square(cell_size, wall, "red", "black")
 
-    # draw_starting_point()
-    
-    print("Wall List: ", maze_wall_list)
-    print()
-    print("Path List: ", maze_route)
-    print()
-    print("Visited List: ", sorted(visited_list))
+    draw_starting_point()
+
+    # print("Wall List: ", maze_wall_list)
+    # print()
+    # print("Path List: ", maze_route)
+    # print()
+    # print("Visited List: ", sorted(visited_list))
 
 
 def check_right():
