@@ -6,7 +6,7 @@ import random
 min_x, min_y, max_x, max_y = -100, -200, 100, 200
 print("box Size", (min_x, min_y, max_x, max_y))
 # cell_size = random.choice([10, 20, 25,])
-cell_size = random.choice([5])
+cell_size = random.choice([25])
 
 # print("Cell size", cell_size)
 
@@ -195,6 +195,23 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
     return random_index, wall_index
 
 
+def draw_starting_point():
+    starting = turtle.Turtle(visible=False)
+    starting.getscreen().tracer(0)
+
+    starting_y_point = ((cell_size/2)+cell_size)
+    for line in range(3):
+        starting_x_point = -((cell_size/2)+cell_size)
+        for row in range(3):
+            starting.goto(starting_x_point, starting_y_point)
+            draw_square(cell_size, starting, "blue", "blue")
+            starting_x_point += cell_size
+        # Drawing down
+        starting_y_point -= cell_size
+        # starting.goto(starting_x_point, starting_y_point)
+        # draw_square(cell_size, starting, "white", "black")
+
+
 def is_maze_position_valid(position, visited_list):
     if position not in visited_list:  # The position has not changed
         return True
@@ -213,6 +230,16 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
     visited_list = [0]
     stack = [0]
 
+    route1 = turtle.Turtle()
+    route2 = turtle.Turtle()
+    route3 = turtle.Turtle()
+    route4 = turtle.Turtle()
+
+    wall1 = turtle.Turtle()
+    wall2 = turtle.Turtle()
+    wall3 = turtle.Turtle()
+    wall4 = turtle.Turtle()
+
     route = turtle.Turtle()
     route.speed(0)
     route.getscreen().tracer(10, 5)
@@ -226,6 +253,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
     route.goto(min_x, max_y)
     route.pendown()
 
+    
     draw_square(cell_size, route, "green", "black")
 
     current_index = 0
@@ -251,8 +279,8 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
                 maze_route.append(current_index)
                 route.goto(list_of_all_boxes_1d[current_index][0])
                 draw_square(cell_size, route, "green", "black")
-                
-            # Drawing the walls 
+
+            # Drawing the walls
             if current_wall_index != None and current_wall_index < len(list_of_all_boxes_1d):
                 visited_list.append(current_wall_index)
 
@@ -260,6 +288,8 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
                 wall.goto(list_of_all_boxes_1d[current_wall_index][0])
                 draw_square(cell_size, wall, "red", "black")
 
+    # draw_starting_point()
+    
     print("Wall List: ", maze_wall_list)
     print()
     print("Path List: ", maze_route)
@@ -278,6 +308,7 @@ def run_maze():
     draw_constraint_box(min_x, min_y, max_x, max_y)
     list_of_blocks, list_of_all_boxes_1d = fill_in_constraints_box(
         cell_size, min_x, max_y, vertical_cells, horizontal_cells)
+
     create_maze_route(cell_size, min_x, min_y, max_x, max_y,
                       list_of_blocks, list_of_all_boxes_1d)
 
