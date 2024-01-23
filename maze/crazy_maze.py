@@ -62,8 +62,8 @@ def draw_starting_point():
         # Drawing down
         starting_y_point -= cell_size
 
-    print(
-        f"Center Starting point\n{len(center_starting_pos)}\n{center_starting_pos}")
+    
+    return center_starting_pos
 
     # starting.goto(starting_x_point, starting_y_point)
     # draw_square(cell_size, starting, "white", "black")
@@ -72,7 +72,7 @@ def draw_starting_point():
 # TODO: Clean up this function by removing code that is not being used anymore and write comments
 
 def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_cells):
-    list_of_blocks = []
+    # list_of_blocks = []
     list_of_all_boxes_1d = []
     print("Vertical", vertical_cells)
     print("Horizontal", horizontal_cells)
@@ -83,15 +83,19 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     t.goto(min_x, max_y)
     t.pendown()
 
+    center_starting_blocks = draw_starting_point()
+    [list_of_all_boxes_1d.append(pos) for pos in center_starting_blocks]
+    
     for horizontal in range(horizontal_cells):
-        list_vertical_squares = []
+        # list_vertical_squares = []
         for vertical in range(vertical_cells):
             list_of_squares = draw_square(cell_size, turtle_name=t)
-            list_of_all_boxes_1d.append(list_of_squares)
-            list_vertical_squares.append(list_of_squares)
-            t.forward(cell_size)
+            if list_of_squares not in list_of_all_boxes_1d:
+                list_of_all_boxes_1d.append(list_of_squares)
+                # list_vertical_squares.append(list_of_squares)
+                t.forward(cell_size)
             pass
-        list_of_blocks.append(list_vertical_squares)
+        # list_of_blocks.append(list_vertical_squares)
         t.right(90)
         t.forward(cell_size)
         t.left(90)
@@ -101,7 +105,7 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     print(list_of_all_boxes_1d)
     print(len(list_of_all_boxes_1d))
 
-    return list_of_blocks, list_of_all_boxes_1d
+    return list_of_all_boxes_1d
 
     pass
 
@@ -214,8 +218,8 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
                     if i not in visited_list:
                         wall_index = i
                         break
-                if wall_index:
-                    break
+            if wall_index:
+                break
 
     return random_index, wall_index
 
@@ -230,7 +234,7 @@ def is_maze_position_valid(position, visited_list):
     pass
 
 
-def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, list_of_all_boxes_1d):
+def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1d):
     horizontal_cells = int((-min_x + max_x) / cell_size)
     vertical_cells = int((-min_y + max_y) / cell_size)
     maze_route = [0]
@@ -295,7 +299,8 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_blocks, lis
                 wall.goto(list_of_all_boxes_1d[current_wall_index][0])
                 draw_square(cell_size, wall, "red", "black")
 
-    draw_starting_point()
+    # draw_starting_point()
+    # route1.home()
 
     # print("Wall List: ", maze_wall_list)
     # print()
@@ -313,11 +318,11 @@ def run_maze():
     horizontal_cells = int((-min_y + max_y) / cell_size)
     screen = turtle.Screen()
     draw_constraint_box(min_x, min_y, max_x, max_y)
-    list_of_blocks, list_of_all_boxes_1d = fill_in_constraints_box(
+    list_of_all_boxes_1d = fill_in_constraints_box(
         cell_size, min_x, max_y, vertical_cells, horizontal_cells)
 
     create_maze_route(cell_size, min_x, min_y, max_x, max_y,
-                      list_of_blocks, list_of_all_boxes_1d)
+                      list_of_all_boxes_1d)
 
     screen.exitonclick()
 
