@@ -46,8 +46,8 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
 
 
 def draw_starting_point():
-    starting = turtle.Turtle(visible=False)
-    starting.getscreen().tracer(0)
+    starting = turtle.Turtle(visible=True)
+    starting.getscreen().tracer(1)
     center_starting_pos = []
     starting_y_point = ((cell_size/2)+cell_size)
     for line in range(3):
@@ -83,17 +83,14 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     t.goto(min_x, max_y)
     t.pendown()
 
-    center_starting_blocks = draw_starting_point()
-    [list_of_all_boxes_1d.append(pos) for pos in center_starting_blocks]
     
     for horizontal in range(horizontal_cells):
         # list_vertical_squares = []
         for vertical in range(vertical_cells):
             list_of_squares = draw_square(cell_size, turtle_name=t)
-            if list_of_squares not in list_of_all_boxes_1d:
-                list_of_all_boxes_1d.append(list_of_squares)
-                # list_vertical_squares.append(list_of_squares)
-                t.forward(cell_size)
+            list_of_all_boxes_1d.append(list_of_squares)
+            # list_vertical_squares.append(list_of_squares)
+            t.forward(cell_size)
             pass
         # list_of_blocks.append(list_vertical_squares)
         t.right(90)
@@ -102,6 +99,8 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
         t.back(vertical_cells*cell_size)
     # t.getscreen().tracer(1)
 
+    center_starting_blocks = draw_starting_point()
+    # [list_of_all_boxes_1d.append(pos) for pos in center_starting_blocks]
     print(list_of_all_boxes_1d)
     print(len(list_of_all_boxes_1d))
 
