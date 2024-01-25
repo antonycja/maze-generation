@@ -34,7 +34,7 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
     turtle_name.begin_poly()
     turtle_name.pencolor(pen_color)
     turtle_name.fillcolor(color)
-    turtle_name.pen(shown=False, pencolor=pen_color, fillcolor=color, speed=0)
+    turtle_name.pen(shown=True, pencolor=pen_color, fillcolor=color, speed=0)
     turtle_name.begin_fill()
     for _ in range(4):
         turtle_name.forward(cell_size)
@@ -48,7 +48,7 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
 
 def draw_starting_point():
     starting = turtle.Turtle(visible=True)
-    starting.getscreen().tracer(1)
+    starting.getscreen().tracer(0)
     center_starting_pos = []
     starting_y_point = cell_size
     for line in range(2):
@@ -59,7 +59,7 @@ def draw_starting_point():
             draw_square(cell_size, starting, "blue", "blue")
             starting_x_point += cell_size
             starting.end_poly()
-            center_starting_pos.append(starting.get_poly())
+            center_starting_pos.append(starting.get_poly()[0])
         # Drawing down
         starting_y_point -= cell_size
 
@@ -87,7 +87,7 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
         # list_vertical_squares = []
         for vertical in range(vertical_cells):
             list_of_squares = draw_square(cell_size, turtle_name=t)
-            list_of_all_boxes_1d.append(list_of_squares)
+            list_of_all_boxes_1d.append(list_of_squares[0])
             # list_vertical_squares.append(list_of_squares)
             t.forward(cell_size)
             pass
@@ -199,7 +199,7 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
                     break
             break
         else:
-            if all(in_visited) and len(stack) != 1:
+            if all(in_visited) and len(stack) > 1:
                 # Do the stack reverse here
 
                 # print("going back")
@@ -207,7 +207,7 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
                 random_index = stack[-1]
                 wall_index = None
                 break
-            elif len(stack) == 1:
+            elif len(stack) == 0:
                 # Check is the stack only have one value, if so then there are no more possible routes start placing walls where there isn't
                 random_index = None
                 for i in range(0, len_of_obs):
@@ -233,10 +233,10 @@ def is_maze_position_valid(position, visited_list):
 def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1d, center_starting_blocks):
     horizontal_cells = int((-min_x + max_x) / cell_size)
     vertical_cells = int((-min_y + max_y) / cell_size)
-    maze_route = [0]
+    maze_route = []
     maze_wall_list = []
-    visited_list = [0]
-    stack = [0]
+    visited_list = []
+    stack = []
 
     route1 = turtle.Turtle()
     route2 = turtle.Turtle()
@@ -251,21 +251,29 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     route = turtle.Turtle()
     route.speed(0)
     route.getscreen().tracer(10, 5)
+    # route.getscreen().tracer(1)
     wall = turtle.Turtle()
     wall.getscreen().tracer(10, 5)
+    # wall.getscreen().tracer(1)
     wall.speed(0)
     route.pen(pencolor="green", pendown=False, fillcolor="white")
     wall.penup()
-    wall.goto(min_x, max_y)
-
-    route.goto(min_x, max_y)
+    # wall.right(90)
+    wall.goto(center_starting_blocks[-2])
+    # route.right(90)
+    route.goto(center_starting_blocks[-2])
     route.pendown()
 
-    draw_square(cell_size, route, "green", "black")
-    [visited_list.append(pos) for pos in center_starting_blocks]
-    [maze_route.append(pos) for pos in center_starting_blocks]
+    # draw_square(cell_size, route, "green", "black")
+    [visited_list.append(list_of_all_boxes_1d.index(pos)) for pos in center_starting_blocks]
+    [maze_route.append(list_of_all_boxes_1d.index(pos)) for pos in center_starting_blocks]
+    [stack.append(list_of_all_boxes_1d.index(pos)) for pos in center_starting_blocks]
+    
+    current_index = list_of_all_boxes_1d.index(center_starting_blocks[0])
+    
+    for pos in center_starting_blocks:
+        list_of_all_boxes_1d.remove(pos)
 
-    current_index = 0
 
     while len(visited_list) < (len(list_of_all_boxes_1d)):
 
@@ -286,7 +294,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
                 if current_index not in stack:
                     stack.append(current_index)
                 maze_route.append(current_index)
-                route.goto(list_of_all_boxes_1d[current_index][0])
+                route.goto(list_of_all_boxes_1d[current_index])
                 draw_square(cell_size, route, "green", "black")
 
             # Drawing the walls
@@ -294,22 +302,31 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
                 visited_list.append(current_wall_index)
 
                 maze_wall_list.append(current_wall_index)
-                wall.goto(list_of_all_boxes_1d[current_wall_index][0])
+                wall.goto(list_of_all_boxes_1d[current_wall_index])
                 draw_square(cell_size, wall, "red", "black")
-
-    # draw_starting_point()
-    # route1.home()
-
-    # print("Wall List: ", maze_wall_list)
-    # print()
-    # print("Path List: ", maze_route)
-    # print()
-    # print("Visited List: ", sorted(visited_list))
 
 
 def check_right():
     pass
-
+def convert_vec2d_to_int_tuple(vec2d_list):
+    
+    for box in vec2d_list:
+        index = vec2d_list.index(box)
+        box_tuple = (int(box[0]), int(box[1]))
+        if box_tuple[0] % cell_size != 0:
+            if box_tuple[0] > 0:
+                box_tuple = (box_tuple[0]+1, box_tuple[1])
+            else:
+                box_tuple = (box_tuple[0]-1, box_tuple[1])
+        if box_tuple[1] % cell_size != 0:  
+            if box_tuple[1] > 0:
+                box_tuple = (box_tuple[0], box_tuple[1]+1)
+            else:
+                box_tuple = (box_tuple[0], box_tuple[1]-1)   
+                   
+        vec2d_list[index] = (box_tuple)
+        
+    return vec2d_list
 
 def run_maze():
     vertical_cells = int((-min_x + max_x) / cell_size)
@@ -318,46 +335,37 @@ def run_maze():
     draw_constraint_box(min_x, min_y, max_x, max_y)
     list_of_all_boxes_1d = fill_in_constraints_box(
         cell_size, min_x, max_y, vertical_cells, horizontal_cells)
-
-    list_of_all_boxes_1d = [box[0] for box in list_of_all_boxes_1d]
     
-    print(list_of_all_boxes_1d)
-    print(len(list_of_all_boxes_1d))
+    # print(list_of_all_boxes_1d)
+
+
+    # list_of_all_boxes_1d = [((box[0]), int(box[1])) for box in list_of_all_boxes_1d]
+    list_of_all_boxes_1d = convert_vec2d_to_int_tuple(list_of_all_boxes_1d)
+
+    # print(list_of_all_boxes_1d)
+    # print(len(list_of_all_boxes_1d))
     
 
     center_starting_blocks = draw_starting_point()
-    center_starting_blocks = [box[0] for box in center_starting_blocks]
+    # center_starting_blocks = [(int(box[0]), int(box[0]) ) for box in center_starting_blocks]
+    center_starting_blocks = convert_vec2d_to_int_tuple(center_starting_blocks)
     
-    print(center_starting_blocks)
+    # print(center_starting_blocks)
     
     
-    print("starting blocks \n",center_starting_blocks)
+    # print("starting blocks :-> ",len(center_starting_blocks))
     # [print(pos) for pos in list_of_all_boxes_1d if pos in center_starting_blocks]
-    print("Old List:", len(list_of_all_boxes_1d))
+    # print("Old List:", len(list_of_all_boxes_1d))
     
 
-    p = (0.00,25.00)
-    print("List of all boxes:", type(list_of_all_boxes_1d[0]))
-    print("List centers:", type(center_starting_blocks[0]))
+    # p = (0.00,25.00)
+    # print("List of all boxes:", type(list_of_all_boxes_1d[0]))
+    # print("List centers:", type(center_starting_blocks[0]))
     
-    # for pos in center_starting_blocks:
-        
-    #     print(list_of_all_boxes_1d.index(pos))
-    #     # pos = pos
-        # if pos in list_of_all_boxes_1d:
-        #     print("Found")
-        # else:
-        #     print(pos, "Not found")
-    
-    
-            # list_of_all_boxes_1d.remove(pos)
-    # [list_of_all_boxes_1d.remove(pos) for pos in center_starting_blocks]
 
-    # for pos in center_starting_blocks:
-    #     for curr_pos in list_of_all_boxes_1d:
-    #         if pos == curr_pos:
-    #             list_of_all_boxes_1d.remove(curr_pos)
-    print("New List:", len(list_of_all_boxes_1d))
+
+    # print("New List:", len(list_of_all_boxes_1d))
+    
     create_maze_route(cell_size, min_x, min_y, max_x, max_y,
                       list_of_all_boxes_1d, center_starting_blocks)
 
