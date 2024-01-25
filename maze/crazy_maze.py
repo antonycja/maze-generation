@@ -52,7 +52,7 @@ def draw_starting_point():
     center_starting_pos = []
     starting_y_point = cell_size
     for line in range(2):
-        starting_x_point = cell_size*-1
+        starting_x_point = -cell_size
         for row in range(2):
             starting.begin_poly()
             starting.goto(starting_x_point, starting_y_point)
@@ -99,8 +99,7 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     # t.getscreen().tracer(1)
 
     # [list_of_all_boxes_1d.append(pos) for pos in center_starting_blocks]
-    print(list_of_all_boxes_1d)
-    print(len(list_of_all_boxes_1d))
+
 
     return list_of_all_boxes_1d
 
@@ -320,12 +319,45 @@ def run_maze():
     list_of_all_boxes_1d = fill_in_constraints_box(
         cell_size, min_x, max_y, vertical_cells, horizontal_cells)
 
-    center_starting_blocks = draw_starting_point()
-    for pos in center_starting_blocks:
-        for curr_pos in list_of_all_boxes_1d:
-            if pos == curr_pos:
-                list_of_all_boxes_1d.remove(curr_pos)
+    list_of_all_boxes_1d = [box[0] for box in list_of_all_boxes_1d]
     
+    print(list_of_all_boxes_1d)
+    print(len(list_of_all_boxes_1d))
+    
+
+    center_starting_blocks = draw_starting_point()
+    center_starting_blocks = [box[0] for box in center_starting_blocks]
+    
+    print(center_starting_blocks)
+    
+    
+    print("starting blocks \n",center_starting_blocks)
+    # [print(pos) for pos in list_of_all_boxes_1d if pos in center_starting_blocks]
+    print("Old List:", len(list_of_all_boxes_1d))
+    
+
+    p = (0.00,25.00)
+    print("List of all boxes:", type(list_of_all_boxes_1d[0]))
+    print("List centers:", type(center_starting_blocks[0]))
+    
+    # for pos in center_starting_blocks:
+        
+    #     print(list_of_all_boxes_1d.index(pos))
+    #     # pos = pos
+        # if pos in list_of_all_boxes_1d:
+        #     print("Found")
+        # else:
+        #     print(pos, "Not found")
+    
+    
+            # list_of_all_boxes_1d.remove(pos)
+    # [list_of_all_boxes_1d.remove(pos) for pos in center_starting_blocks]
+
+    # for pos in center_starting_blocks:
+    #     for curr_pos in list_of_all_boxes_1d:
+    #         if pos == curr_pos:
+    #             list_of_all_boxes_1d.remove(curr_pos)
+    print("New List:", len(list_of_all_boxes_1d))
     create_maze_route(cell_size, min_x, min_y, max_x, max_y,
                       list_of_all_boxes_1d, center_starting_blocks)
 
