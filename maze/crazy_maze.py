@@ -238,16 +238,6 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     visited_list = []
     stack = []
 
-    route1 = turtle.Turtle()
-    route2 = turtle.Turtle()
-    route3 = turtle.Turtle()
-    route4 = turtle.Turtle()
-
-    wall1 = turtle.Turtle()
-    wall2 = turtle.Turtle()
-    wall3 = turtle.Turtle()
-    wall4 = turtle.Turtle()
-
     route = turtle.Turtle()
     route.speed(0)
     route.getscreen().tracer(10, 5)
