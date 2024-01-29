@@ -2,62 +2,63 @@ import turtle
 import random
 from math import ceil
 
-# min_x, min_y, max_x, max_y = random.choice([(
-#     -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
-min_x, min_y, max_x, max_y = -100, -200, 100, 200
+min_x, min_y, max_x, max_y = random.choice([(
+    -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
+# min_x, min_y, max_x, max_y = -100, -200, 100, 200
 print("box Size", (min_x, min_y, max_x, max_y))
-# cell_size = random.choice([10, 20, 25,])
-cell_size = random.choice([25])
+cell_size = random.choice([10, 20, 25,])
+# cell_size = random.choice([5])
 
 # print("Cell size", cell_size)
 
 
 def draw_constraint_box(min_x, min_y, max_x, max_y):
-    tim = turtle.Turtle(visible=True)
-    # tim.getscreen().tracer(1)
+    outline_wall = []
+    tim = turtle.Turtle(visible=False)
+    tim.getscreen().tracer(0)
     tim.pen(speed=0, pendown=False)
     tim.goto(min_x, max_y)
 
-    for i in range(min_x-cell_size, max_x+cell_size, cell_size):
+    # top - left to right
+    for i in range(min_x, max_x-cell_size, cell_size):
+        pos = (i, max_y)
         tim.penup()
-        tim.goto(i, max_y+cell_size)
+        tim.goto(pos)
         tim.pendown()
-        draw_square(cell_size, tim, "blue", "blue")
-        
-    for i in range(max_y+cell_size, min_y-cell_size,  -cell_size):
-        tim.penup()
-        tim.goto(max_x, i)
-        tim.pendown()
-        draw_square(cell_size, tim, "blue", "blue")
-        
-    for i in range(min_x-cell_size, max_x+cell_size, cell_size):
-        tim.penup()
-        tim.goto(i, min_y+cell_size)
-        tim.pendown()
-        draw_square(cell_size, tim, "blue", "blue")
-        
-    for i in range(max_y+cell_size, min_y-cell_size,  -cell_size):
-        tim.penup()
-        tim.goto(max_x, i)
-        tim.pendown()
-        draw_square(cell_size, tim, "blue", "blue")
-        
-            
-    # tim.goto(max_x, max_y)
-    # tim.right(90)
-    # tim.goto(max_x, min_y)
-    # tim.right(90)
-    # tim.goto(min_x, min_y)
-    # tim.right(90)
-    # tim.goto(min_x, max_y)
+        draw_square(cell_size, tim, "black", "black")
+        outline_wall.append(pos)
 
-    pass
+    # right - top to bottom
+    for i in range(max_y, min_y+cell_size,  -cell_size):
+        pos = (max_x-cell_size, i)
+        tim.penup()
+        tim.goto(pos)
+        tim.pendown()
+        draw_square(cell_size, tim, "black", "black")
+        outline_wall.append(pos)
+
+    # left - top to bottom
+    for i in range(max_y, min_y+cell_size,  -cell_size):
+        pos = (min_x, i)
+        tim.penup()
+        tim.goto(pos)
+        tim.pendown()
+        draw_square(cell_size, tim, "black", "black")
+        outline_wall.append(pos)
+
+    for i in range(min_x, max_x, cell_size):
+        pos = (i, min_y+cell_size)
+        tim.penup()
+        tim.goto(pos)
+        tim.pendown()
+        draw_square(cell_size, tim, "black", "black")
+        outline_wall.append(pos)
+
+    return outline_wall
 
 
-def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
+def draw_square(cell_size, turtle_name, color="black", pen_color="black"):
     turtle_name.begin_poly()
-    turtle_name.pencolor(pen_color)
-    turtle_name.fillcolor(color)
     turtle_name.pen(shown=True, pencolor=pen_color, fillcolor=color, speed=0)
     turtle_name.begin_fill()
     for _ in range(4):
@@ -71,7 +72,7 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="red"):
 
 
 def draw_starting_point():
-    starting = turtle.Turtle(visible=True)
+    starting = turtle.Turtle(visible=False)
     starting.getscreen().tracer(0)
     center_starting_pos = []
     starting_y_point = cell_size
@@ -80,7 +81,7 @@ def draw_starting_point():
         for row in range(2):
             starting.begin_poly()
             starting.goto(starting_x_point, starting_y_point)
-            draw_square(cell_size, starting, "blue", "blue")
+            draw_square(cell_size, starting, "white", "white")
             starting_x_point += cell_size
             starting.end_poly()
             center_starting_pos.append(starting.get_poly()[0])
@@ -96,7 +97,6 @@ def draw_starting_point():
 # TODO: Clean up this function by removing code that is not being used anymore and write comments
 
 def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_cells):
-    # list_of_blocks = []
     list_of_all_boxes_1d = []
     print("Vertical", vertical_cells)
     print("Horizontal", horizontal_cells)
@@ -108,22 +108,15 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     t.pendown()
 
     for horizontal in range(horizontal_cells):
-        # list_vertical_squares = []
         for vertical in range(vertical_cells):
             list_of_squares = draw_square(cell_size, turtle_name=t)
             list_of_all_boxes_1d.append(list_of_squares[0])
-            # list_vertical_squares.append(list_of_squares)
             t.forward(cell_size)
             pass
-        # list_of_blocks.append(list_vertical_squares)
         t.right(90)
         t.forward(cell_size)
         t.left(90)
         t.back(vertical_cells*cell_size)
-    # t.getscreen().tracer(1)
-
-    # [list_of_all_boxes_1d.append(pos) for pos in center_starting_blocks]
-
 
     return list_of_all_boxes_1d
 
@@ -131,8 +124,8 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
 
 
 def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stack, maze_route):
-    # print(current_index + x_cells)
-    len_of_obs = (x_cells*y_cells)
+
+    len_of_obs = (x_cells * y_cells)
     if current_index == None:
         current_index = 0
     # Check the first index, and choose an index to place the wall.
@@ -241,10 +234,9 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
                 try:
                     if wall_index >= 0:
                         break
-                except:
+                except UnboundLocalError:
+                    wall_index = 0
                     pass
-                # if wall_index or wall_index == 0:
-                #     break
 
     return random_index, wall_index
 
@@ -259,7 +251,7 @@ def is_maze_position_valid(position, visited_list):
     pass
 
 
-def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1d, center_starting_blocks):
+def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list):
     horizontal_cells = int((-min_x + max_x) / cell_size)
     vertical_cells = int((-min_y + max_y) / cell_size)
     maze_route = []
@@ -269,13 +261,13 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
 
     route = turtle.Turtle()
     route.speed(0)
-    route.getscreen().tracer(10, 5)
-    # route.getscreen().tracer(1)
+    # route.getscreen().tracer(10, 5)
+    route.getscreen().tracer(0)
     wall = turtle.Turtle()
-    wall.getscreen().tracer(10, 5)
-    # wall.getscreen().tracer(1)
+    # wall.getscreen().tracer(10, 5)
+    wall.getscreen().tracer(0)
     wall.speed(0)
-    route.pen(pencolor="green", pendown=False, fillcolor="white")
+    route.pen(pencolor="lawngreen", pendown=False, fillcolor="lawngreen")
     wall.penup()
     # wall.right(90)
     wall.goto(center_starting_blocks[-2])
@@ -284,15 +276,32 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     route.pendown()
 
     # draw_square(cell_size, route, "green", "black")
-    [visited_list.append(list_of_all_boxes_1d.index(pos)) for pos in center_starting_blocks]
-    [maze_route.append(list_of_all_boxes_1d.index(pos)) for pos in center_starting_blocks]
-    [stack.append(list_of_all_boxes_1d.index(pos)) for pos in center_starting_blocks]
-    
-    current_index = list_of_all_boxes_1d.index(center_starting_blocks[0])
-    
-    for pos in center_starting_blocks:
-        list_of_all_boxes_1d.remove(pos)
 
+    # Add the index of the center starting block pos in the list of all boxes to the visited list
+    [visited_list.append(list_of_all_boxes_1d.index(pos))
+     for pos in center_starting_blocks]
+
+    # Add the index of the outline wall pos list pos in the list of all boxes to the visited list
+    [visited_list.append(list_of_all_boxes_1d.index(pos))
+     for pos in outline_wall_pos_list]
+    [maze_wall_list.append(list_of_all_boxes_1d.index(pos))
+     for pos in outline_wall_pos_list]
+
+    # Add the index of the center starting block pos in the list of all boxes to the route list
+    [maze_route.append(list_of_all_boxes_1d.index(pos))
+     for pos in center_starting_blocks]
+
+    # Add the index of the center starting block pos in the list of all boxes to the stack
+    [stack.append(list_of_all_boxes_1d.index(pos))
+     for pos in center_starting_blocks]
+
+    current_index = list_of_all_boxes_1d.index(center_starting_blocks[0])
+
+    # Remove the center starting pos from the list of positions
+    # [list_of_all_boxes_1d.remove(pos) for pos in center_starting_blocks]
+
+    # Remove the outline wall pos for the list of positions
+    # [list_of_all_boxes_1d.remove(pos) for pos in outline_wall_pos_list if pos in list_of_all_boxes_1d]
 
     while len(visited_list) < (len(list_of_all_boxes_1d)):
 
@@ -307,14 +316,16 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
             if len(stack) != 0:
                 pass
             # Drawing the path
-            if current_index != None and current_index < len(list_of_all_boxes_1d):
+            if current_index != None and current_index < len(list_of_all_boxes_1d) and current_index not in visited_list:
                 if current_index not in visited_list:
                     visited_list.append(current_index)
                 if current_index not in stack:
                     stack.append(current_index)
                 maze_route.append(current_index)
+                route.penup()
                 route.goto(list_of_all_boxes_1d[current_index])
-                draw_square(cell_size, route, "green", "black")
+                route.pendown()
+                draw_square(cell_size, route, "lawngreen", "")
 
             # Drawing the walls
             if current_wall_index != None and current_wall_index < len(list_of_all_boxes_1d):
@@ -322,13 +333,71 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
 
                 maze_wall_list.append(current_wall_index)
                 wall.goto(list_of_all_boxes_1d[current_wall_index])
-                draw_square(cell_size, wall, "red", "black")
+                draw_square(cell_size, wall, "black", "")
+
+    # open the exit points
+    cells = horizontal_cells*vertical_cells
+
+    # Open Top
+    while True:
+        random_top = random.randint(0, horizontal_cells)
+        if random_top+horizontal_cells in maze_route:
+            maze_route.append(random_top)
+            maze_wall_list.remove(random_top)
+            route.penup()
+            route.goto(list_of_all_boxes_1d[random_top])
+            route.pendown()
+            draw_square(cell_size, route, "lawngreen", "")
+            break
+
+    # Open bottom
+    while True:
+        random_bottom = random.randint((cells)-horizontal_cells, cells)
+        if random_bottom-horizontal_cells in maze_route:
+            maze_route.append(random_bottom)
+            maze_wall_list.remove(random_bottom)
+            route.penup()
+            route.goto(list_of_all_boxes_1d[random_bottom])
+            route.pendown()
+            draw_square(cell_size, route, "lawngreen", "")
+            break
+
+    # Open Left
+    while True:
+        # random_left = random.randint(0, cells)
+        random_left = [num for num in range(
+            0, cells) if num % horizontal_cells == 0]
+        random_left = random.choice(random_left)
+        if random_left+1 in maze_route:
+            maze_route.append(random_left)
+            maze_wall_list.remove(random_left)
+            route.penup()
+            route.goto(list_of_all_boxes_1d[random_left])
+            route.pendown()
+            draw_square(cell_size, route, "lawngreen", "")
+            break
+
+    # Open Right
+    while True:
+        random_right = [
+            num-1 for num in range(0, cells) if num % horizontal_cells == 0 and num > horizontal_cells]
+        random_right = random.choice(random_right)
+        if random_right-1 in maze_route:
+            maze_route.append(random_right)
+            maze_wall_list.remove(random_right)
+            route.penup()
+            route.goto(list_of_all_boxes_1d[random_right])
+            route.pendown()
+            draw_square(cell_size, route, "lawngreen", "")
+            break
 
 
 def check_right():
     pass
+
+
 def convert_vec2d_to_int_tuple(vec2d_list):
-    
+
     for box in vec2d_list:
         index = vec2d_list.index(box)
         box_tuple = (int(box[0]), int(box[1]))
@@ -337,56 +406,42 @@ def convert_vec2d_to_int_tuple(vec2d_list):
                 box_tuple = (box_tuple[0]+1, box_tuple[1])
             else:
                 box_tuple = (box_tuple[0]-1, box_tuple[1])
-        if box_tuple[1] % cell_size != 0:  
+        if box_tuple[1] % cell_size != 0:
             if box_tuple[1] > 0:
                 box_tuple = (box_tuple[0], box_tuple[1]+1)
             else:
-                box_tuple = (box_tuple[0], box_tuple[1]-1)   
-                   
+                box_tuple = (box_tuple[0], box_tuple[1]-1)
+
         vec2d_list[index] = (box_tuple)
-        
+
     return vec2d_list
+
 
 def run_maze():
     vertical_cells = int((-min_x + max_x) / cell_size)
     horizontal_cells = int((-min_y + max_y) / cell_size)
     screen = turtle.Screen()
-    draw_constraint_box(min_x, min_y, max_x, max_y)
     list_of_all_boxes_1d = fill_in_constraints_box(
         cell_size, min_x, max_y, vertical_cells, horizontal_cells)
-    
-    # print(list_of_all_boxes_1d)
 
+    # print(list_of_all_boxes_1d)
 
     # list_of_all_boxes_1d = [((box[0]), int(box[1])) for box in list_of_all_boxes_1d]
     list_of_all_boxes_1d = convert_vec2d_to_int_tuple(list_of_all_boxes_1d)
 
     # print(list_of_all_boxes_1d)
     # print(len(list_of_all_boxes_1d))
-    
 
     center_starting_blocks = draw_starting_point()
     # center_starting_blocks = [(int(box[0]), int(box[0]) ) for box in center_starting_blocks]
     center_starting_blocks = convert_vec2d_to_int_tuple(center_starting_blocks)
-    
-    # print(center_starting_blocks)
-    
-    
-    # print("starting blocks :-> ",len(center_starting_blocks))
-    # [print(pos) for pos in list_of_all_boxes_1d if pos in center_starting_blocks]
-    # print("Old List:", len(list_of_all_boxes_1d))
-    
 
-    # p = (0.00,25.00)
-    # print("List of all boxes:", type(list_of_all_boxes_1d[0]))
-    # print("List centers:", type(center_starting_blocks[0]))
-    
-
+    outline_wall_pos_list = draw_constraint_box(min_x, min_y, max_x, max_y)
 
     # print("New List:", len(list_of_all_boxes_1d))
-    
+
     create_maze_route(cell_size, min_x, min_y, max_x, max_y,
-                      list_of_all_boxes_1d, center_starting_blocks)
+                      list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list)
 
     screen.exitonclick()
 
