@@ -13,19 +13,43 @@ cell_size = random.choice([25])
 
 
 def draw_constraint_box(min_x, min_y, max_x, max_y):
-    tim = turtle.Turtle(visible=False)
-    tim.getscreen().tracer(1)
+    tim = turtle.Turtle(visible=True)
+    # tim.getscreen().tracer(1)
     tim.pen(speed=0, pendown=False)
     tim.goto(min_x, max_y)
-    tim.pendown()
 
-    tim.goto(max_x, max_y)
-    tim.right(90)
-    tim.goto(max_x, min_y)
-    tim.right(90)
-    tim.goto(min_x, min_y)
-    tim.right(90)
-    tim.goto(min_x, max_y)
+    for i in range(min_x-cell_size, max_x+cell_size, cell_size):
+        tim.penup()
+        tim.goto(i, max_y+cell_size)
+        tim.pendown()
+        draw_square(cell_size, tim, "blue", "blue")
+        
+    for i in range(max_y+cell_size, min_y-cell_size,  -cell_size):
+        tim.penup()
+        tim.goto(max_x, i)
+        tim.pendown()
+        draw_square(cell_size, tim, "blue", "blue")
+        
+    for i in range(min_x-cell_size, max_x+cell_size, cell_size):
+        tim.penup()
+        tim.goto(i, min_y+cell_size)
+        tim.pendown()
+        draw_square(cell_size, tim, "blue", "blue")
+        
+    for i in range(max_y+cell_size, min_y-cell_size,  -cell_size):
+        tim.penup()
+        tim.goto(max_x, i)
+        tim.pendown()
+        draw_square(cell_size, tim, "blue", "blue")
+        
+            
+    # tim.goto(max_x, max_y)
+    # tim.right(90)
+    # tim.goto(max_x, min_y)
+    # tim.right(90)
+    # tim.goto(min_x, min_y)
+    # tim.right(90)
+    # tim.goto(min_x, max_y)
 
     pass
 
@@ -207,15 +231,20 @@ def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stac
                 random_index = stack[-1]
                 wall_index = None
                 break
-            elif len(stack) == 0:
+            elif len(stack) == 1 and all(in_visited):
                 # Check is the stack only have one value, if so then there are no more possible routes start placing walls where there isn't
                 random_index = None
                 for i in range(0, len_of_obs):
                     if i not in visited_list:
                         wall_index = i
                         break
-                if wall_index:
-                    break
+                try:
+                    if wall_index >= 0:
+                        break
+                except:
+                    pass
+                # if wall_index or wall_index == 0:
+                #     break
 
     return random_index, wall_index
 
