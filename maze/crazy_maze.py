@@ -1,17 +1,30 @@
 import turtle
 import random
 
-min_x, min_y, max_x, max_y = random.choice([(
-    -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
-# min_x, min_y, max_x, max_y = -100, -200, 100, 200
-print("box Size", (min_x, min_y, max_x, max_y))
-cell_size = random.choice([10, 20, 25,])
-# cell_size = random.choice([5])
+# min_x, min_y, max_x, max_y = random.choice([(
+    # -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
+min_x, min_y, max_x, max_y = -100, -100, 100, 100
+
+# print("box Size", (min_x, min_y, max_x, max_y))
+
+# cell_size = random.choice([10, 20, 25,])
+cell_size = random.choice([25])
 
 # print("Cell size", cell_size)
 
 
-def draw_constraint_box(min_x, min_y, max_x, max_y):
+def draw_constraint_box(min_x: int, min_y: int, max_x: int, max_y: int) -> list:
+    """Draw the outline box and return the position of each box.
+
+    Args:
+        min_x (int): the minimum point on the x axis.
+        min_y (int): the minimum point on the y axis.
+        max_x (int): the maximum point on the x axis.
+        max_y (int): the maximum point on the y axis
+
+    Returns:
+        list: list of coordinates (tuples) for the outline box.
+    """
     outline_wall = []
     tim = turtle.Turtle(visible=False)
     tim.getscreen().tracer(0)
@@ -28,23 +41,23 @@ def draw_constraint_box(min_x, min_y, max_x, max_y):
         outline_wall.append(pos)
 
     # right - top to bottom
-    for i in range(max_y, min_y+cell_size,  -cell_size):
-        pos = (max_x-cell_size, i)
-        tim.penup()
-        tim.goto(pos)
-        tim.pendown()
-        draw_square(cell_size, tim, "black", "black")
-        outline_wall.append(pos)
-
     # left - top to bottom
     for i in range(max_y, min_y+cell_size,  -cell_size):
-        pos = (min_x, i)
+        pos_right = (max_x-cell_size, i)
+        pos_left = (min_x, i)
         tim.penup()
-        tim.goto(pos)
+        tim.goto(pos_right)
         tim.pendown()
         draw_square(cell_size, tim, "black", "black")
-        outline_wall.append(pos)
+        outline_wall.append(pos_right)
 
+        tim.penup()
+        tim.goto(pos_left)
+        tim.pendown()
+        draw_square(cell_size, tim, "black", "black")
+        outline_wall.append(pos_left)
+
+    # bottom - left to right
     for i in range(min_x, max_x, cell_size):
         pos = (i, min_y+cell_size)
         tim.penup()
@@ -56,7 +69,18 @@ def draw_constraint_box(min_x, min_y, max_x, max_y):
     return outline_wall
 
 
-def draw_square(cell_size, turtle_name, color="black", pen_color="black"):
+def draw_square(cell_size: int, turtle_name: str, color="black", pen_color="black") -> list:
+    """Draw a square using the given turtle.
+
+    Args:
+        cell_size (int): the size(length/steps) of each side of the square.
+        turtle_name (str): the name of the turtle to use when drawing.
+        color (str, optional): the fill color of the square. Defaults to "black".
+        pen_color (str, optional): the outline(pen) color of the box. Defaults to "black".
+
+    Returns:
+        turtle.2dVec: a tuple containing the corners of the square.
+    """
     turtle_name.begin_poly()
     turtle_name.pen(shown=True, pencolor=pen_color, fillcolor=color, speed=0)
     turtle_name.begin_fill()
@@ -70,9 +94,14 @@ def draw_square(cell_size, turtle_name, color="black", pen_color="black"):
     pass
 
 
-def draw_starting_point():
+def draw_starting_point() -> list:
+    """draw the center starting point.
+
+    Returns:
+        list(tuple): a list of tuples containing coordinates.
+    """
     starting = turtle.Turtle(visible=False)
-    starting.getscreen().tracer(0)
+    starting.getscreen().tracer(1)
     center_starting_pos = []
     starting_y_point = cell_size
     for line in range(2):
@@ -90,15 +119,25 @@ def draw_starting_point():
     return center_starting_pos
 
 
-# TODO: Clean up this function by removing code that is not being used anymore and write comments
+def fill_in_constraints_box(cell_size: int, min_x: int, max_y: int, vertical_cells: int, horizontal_cells: int) -> list:
+    """Fill in the boxes and return a list containing all those positions.
 
-def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_cells):
+    Args:
+        cell_size (int): the size(length/steps) of each side of the square.
+        min_x (int): the minimum point on the x axis.
+        max_y (int): the maximum point on the x axis.
+        vertical_cells (int): the number of squares that can fit in the box vertically.
+        horizontal_cells (int): the number of squares that can fit in the box horizontally.
+
+    Returns:
+        list: the list of positions available.
+    """
     list_of_all_boxes_1d = []
     print("Vertical", vertical_cells)
     print("Horizontal", horizontal_cells)
     t = turtle.Turtle(visible=False)
     t.speed(0)
-    t.getscreen().tracer(0)
+    t.getscreen().tracer(1)
     t.penup()
     t.goto(min_x, max_y)
     t.pendown()
@@ -119,7 +158,19 @@ def fill_in_constraints_box(cell_size, min_x, max_y, vertical_cells, horizontal_
     pass
 
 
-def choose_random_move_index(current_index, x_cells, y_cells, visited_list, stack, maze_route):
+def choose_random_move_index(current_index: int, x_cells: int, y_cells: int, visited_list: list, stack: list) -> tuple:
+    """Choose a random index to move the robot to.
+
+    Args:
+        current_index (int): the index of the coordinates that the robot is currently on.
+        x_cells (int): the number of squares that can fit in the box horizontally.
+        y_cells (int): the number of squares that can fit in the box vertically
+        visited_list (list): a list containing all previously visited indexes.
+        stack (list): a list that represent a stack containing all the moves being played.
+
+    Returns:
+        tuple(int, int): a tuple containing the random index and the random wall index. 
+    """
 
     len_of_obs = (x_cells * y_cells)
     if current_index == None:
@@ -258,10 +309,10 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     route = turtle.Turtle()
     route.speed(0)
     # route.getscreen().tracer(10, 5)
-    route.getscreen().tracer(0)
+    route.getscreen().tracer(1)
     wall = turtle.Turtle()
     # wall.getscreen().tracer(10, 5)
-    wall.getscreen().tracer(0)
+    wall.getscreen().tracer(1)
     wall.speed(0)
     route.pen(pencolor="lawngreen", pendown=False, fillcolor="lawngreen")
     wall.penup()
@@ -293,16 +344,10 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
 
     current_index = list_of_all_boxes_1d.index(center_starting_blocks[0])
 
-    # Remove the center starting pos from the list of positions
-    # [list_of_all_boxes_1d.remove(pos) for pos in center_starting_blocks]
-
-    # Remove the outline wall pos for the list of positions
-    # [list_of_all_boxes_1d.remove(pos) for pos in outline_wall_pos_list if pos in list_of_all_boxes_1d]
-
     while len(visited_list) < (len(list_of_all_boxes_1d)):
 
         random_index, wall_index = choose_random_move_index(
-            current_index, horizontal_cells, vertical_cells, visited_list, stack, maze_route)
+            current_index, horizontal_cells, vertical_cells, visited_list, stack)
 
         current_index = random_index
         current_wall_index = wall_index
@@ -332,14 +377,23 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
                 draw_square(cell_size, wall, "black", "")
 
     # open the exit points
-    cells = horizontal_cells*vertical_cells
+    exits_list = open_exits(route, maze_route, maze_wall_list,
+                            list_of_all_boxes_1d, horizontal_cells, vertical_cells)
+    
+    return exits_list, maze_route
 
+
+def open_exits(route:turtle, maze_route, maze_wall_list, list_of_all_boxes_1d, horizontal_cells, vertical_cells):
+
+    cells = horizontal_cells*vertical_cells
+    exits_list = []
     # Open Top
     while True:
         random_top = random.randint(0, horizontal_cells)
         if random_top+horizontal_cells in maze_route:
             maze_route.append(random_top)
             maze_wall_list.remove(random_top)
+            exits_list.append(random_top)
             route.penup()
             route.goto(list_of_all_boxes_1d[random_top])
             route.pendown()
@@ -352,6 +406,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
         if random_bottom-horizontal_cells in maze_route:
             maze_route.append(random_bottom)
             maze_wall_list.remove(random_bottom)
+            exits_list.append(random_bottom)
             route.penup()
             route.goto(list_of_all_boxes_1d[random_bottom])
             route.pendown()
@@ -367,6 +422,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
         if random_left+1 in maze_route:
             maze_route.append(random_left)
             maze_wall_list.remove(random_left)
+            exits_list.append(random_left)
             route.penup()
             route.goto(list_of_all_boxes_1d[random_left])
             route.pendown()
@@ -381,18 +437,24 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
         if random_right-1 in maze_route:
             maze_route.append(random_right)
             maze_wall_list.remove(random_right)
+            exits_list.append(random_right)
             route.penup()
             route.goto(list_of_all_boxes_1d[random_right])
             route.pendown()
             draw_square(cell_size, route, "lawngreen", "")
             break
+    return exits_list
 
 
-def check_right():
-    pass
+def convert_vec2d_to_int_tuple(vec2d_list: list) -> list:
+    """Convert a vec2D list to a list of integers.
 
+    Args:
+        vec2d_list (list): a list containing tuples on vec2D values.
 
-def convert_vec2d_to_int_tuple(vec2d_list):
+    Returns:
+        list: a converted list.
+    """
 
     for box in vec2d_list:
         index = vec2d_list.index(box)
@@ -413,7 +475,26 @@ def convert_vec2d_to_int_tuple(vec2d_list):
     return vec2d_list
 
 
+
+
+def solve_maze(exits_list, maze_route):
+    solver = turtle.Turtle()
+    solver.pen(shown=True, pendown=True, pencolor="red", fillcolor="red")
+    solver.home()
+    print("solver reached")
+    # exits_dict = {index}
+    target_exit = exits_list[0]
+    print(target_exit)
+    visited_list = []
+    stack_list = []
+    
+        
+    pass
+
+
+
 def run_maze():
+    # global vertical_cells, horizontal_cells
     vertical_cells = int((-min_x + max_x) / cell_size)
     horizontal_cells = int((-min_y + max_y) / cell_size)
     screen = turtle.Screen()
@@ -428,16 +509,21 @@ def run_maze():
     # print(list_of_all_boxes_1d)
     # print(len(list_of_all_boxes_1d))
 
+    
     center_starting_blocks = draw_starting_point()
     # center_starting_blocks = [(int(box[0]), int(box[0]) ) for box in center_starting_blocks]
     center_starting_blocks = convert_vec2d_to_int_tuple(center_starting_blocks)
 
+    
     outline_wall_pos_list = draw_constraint_box(min_x, min_y, max_x, max_y)
 
     # print("New List:", len(list_of_all_boxes_1d))
 
-    create_maze_route(cell_size, min_x, min_y, max_x, max_y,
+    
+    exits_list, maze_route = create_maze_route(cell_size, min_x, min_y, max_x, max_y,
                       list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list)
+    
+    solve_maze(exits_list, maze_route)
 
     screen.exitonclick()
 
