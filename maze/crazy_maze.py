@@ -1,6 +1,5 @@
 import turtle
 import random
-from math import ceil
 
 min_x, min_y, max_x, max_y = random.choice([(
     -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
@@ -89,9 +88,6 @@ def draw_starting_point():
         starting_y_point -= cell_size
 
     return center_starting_pos
-
-    # starting.goto(starting_x_point, starting_y_point)
-    # draw_square(cell_size, starting, "white", "black")
 
 
 # TODO: Clean up this function by removing code that is not being used anymore and write comments
