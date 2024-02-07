@@ -487,15 +487,20 @@ def solve_maze(exits_list, maze_route, list_of_all_boxes_1d, horizontal_cells, v
     maze_route_pos = [list_of_all_boxes_1d[pos] for pos in maze_route ]
     visited_list = []
     stack_list = []
+    
+    print(maze_route)
+    print(maze_route_pos)
+    print(target_exit)
 
     current_index = list_of_all_boxes_1d.index((0, 0))
-    [visited_list.append(index) for index in maze_route]
+    # [visited_list.append(index) for index in maze_route]
     print("current index:", current_index)
 
-    for _ in range(20):
+    while len(visited_list) < len(maze_route) or current_index != target_exit:
         current_index, wall = choose_random_move_index(
             current_index, horizontal_cells, vertical_cells, visited_list, stack_list)
         print(current_index)
+        break
 
     pass
 
