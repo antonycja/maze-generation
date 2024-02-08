@@ -474,27 +474,22 @@ def convert_vec2d_to_int_tuple(vec2d_list: list) -> list:
 
     return vec2d_list
 
-
-def solve_maze(exits_list, maze_route, list_of_all_boxes_1d, horizontal_cells, vertical_cells):
+def draw_maze_solution():
     solver = turtle.Turtle()
     solver.penup()
     solver.goto(-(cell_size/2), cell_size/2)
     solver.pen(shown=True, pendown=True, pencolor="red", fillcolor="red")
-    # print("solver reached")
-    # exits_dict = {index}
-    target_exit = exits_list[0]
-    print("Target exit: ", target_exit)
+    pass
+
+def find_maze_route(exits_list, maze_route, list_of_all_boxes_1d, horizontal_cells, vertical_cells, target_exit):
+
+
     maze_route_pos = [list_of_all_boxes_1d[pos] for pos in maze_route]
     visited_list = []
     stack_list = []
 
-    # print(maze_route)
-    # print(maze_route_pos)
-    # print(target_exit)
-
     current_index = list_of_all_boxes_1d.index((0, 0))
-    # [visited_list.append(index) for index in maze_route]
-    # print("current index:", current_index)
+    print("starting point: ", current_index)
 
     while len(visited_list) < len(maze_route) or current_index != target_exit:
         current_index, wall = choose_random_move_index(
@@ -503,21 +498,58 @@ def solve_maze(exits_list, maze_route, list_of_all_boxes_1d, horizontal_cells, v
         if current_index not in visited_list or current_index != None and current_index < len(maze_route):
             # check if the index is in the list of visited indexes
             if current_index not in visited_list:
-                visited_list.append(current_index)
+                visited_list.append(list_of_all_boxes_1d[current_index])
 
             # check if the index is in the stack list
             if current_index not in stack_list:
-                stack_list.append(current_index)
+                stack_list.append(list_of_all_boxes_1d[current_index])
 
             pass
-    # print()
-    # print("Original path list:", visited_list)
-    # print("Original path list:", len(visited_list))
-    # print()
-    # print("Path list len: ", stack_list)
-    # print("Path list len: ", len(stack_list))
     
-    return stack_list
+    return stack_list, maze_route_pos
+
+def solve_maze(exits_list, maze_route, list_of_all_boxes_1d,
+                   horizontal_cells, vertical_cells):
+    target_exit = exits_list[0]
+    print("Target exit: ", target_exit)
+    list_of_paths = []
+    for i in range(4):
+        path, path_coordinates  = find_maze_route(exits_list, maze_route, list_of_all_boxes_1d,
+                   horizontal_cells, vertical_cells, target_exit)
+        list_of_paths.append(path)
+    print()
+    print("Iteration 1 list of paths: ")
+    [print(f'{index}:', path) for index,path in enumerate(list_of_paths)]
+    print()
+    print(path_coordinates)
+    
+    # shortest_path = list_of_paths[0]
+    # for path in list_of_paths:
+    #     if len(path) < len(shortest_path):
+    #         shortest_path = path
+            
+    # print("Iteration 1 list of paths: ")
+    # [print(f'{index}:', path) for index,path in enumerate(list_of_paths)]
+    
+    # print()
+    # print()
+    # list_of_paths = []   
+    # for j in range(4):
+    #     path, path_coordinates  = find_maze_route(exits_list, shortest_path, list_of_all_boxes_1d,
+    #                horizontal_cells, vertical_cells, target_exit)
+    #     list_of_paths.append(path)    
+
+    # print()
+    # print("Iteration 2 list of paths: ")
+    # [print(f'{index}:', path) for index,path in enumerate(list_of_paths)]
+    # print()
+    
+    # shortest_path = list_of_paths[0]
+    # for path in list_of_paths:
+    #     if len(path) < len(shortest_path):
+    #         shortest_path = path
+    # print("Iteration 2 shortest path: ", len(shortest_path), shortest_path)
+    pass
 
     pass
 
@@ -552,37 +584,9 @@ def run_maze():
     exits_list, maze_route = create_maze_route(cell_size, min_x, min_y, max_x, max_y,
                                                list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list)
     screen.update()
-    list_of_paths = []
-    for i in range(10):
-        path  = solve_maze(exits_list, maze_route, list_of_all_boxes_1d,
-                   horizontal_cells, vertical_cells)
-        list_of_paths.append(path)
-    print()
-    print("Iteration 1 list of paths: ", len(list_of_paths), list_of_paths)
-    print()
     
-    shortest_path = list_of_paths[0]
-    for path in list_of_paths:
-        if len(path) < len(shortest_path):
-            shortest_path = path
-    print("Iteration 1 shortest path: ", len(shortest_path), shortest_path)
-    print()
-    print()
-    list_of_paths = []   
-    for j in range(4):
-        path  = solve_maze(exits_list, shortest_path, list_of_all_boxes_1d,
+    solve_maze(exits_list, maze_route, list_of_all_boxes_1d,
                    horizontal_cells, vertical_cells)
-        list_of_paths.append(path)    
-
-    print()
-    print("Iteration 2 list of paths: ", len(list_of_paths), list_of_paths)
-    print()
-    
-    shortest_path = list_of_paths[0]
-    for path in list_of_paths:
-        if len(path) < len(shortest_path):
-            shortest_path = path
-    print("Iteration 2 shortest path: ", len(shortest_path), shortest_path)
     screen.update()
 
     screen.exitonclick()
