@@ -1,14 +1,14 @@
 import turtle
 import random
 
-min_x, min_y, max_x, max_y = random.choice([(
--100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
-# min_x, min_y, max_x, max_y = -100, -100, 100, 100
+# min_x, min_y, max_x, max_y = random.choice([(
+# -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
+min_x, min_y, max_x, max_y = -100, -100, 100, 100
 
 # print("box Size", (min_x, min_y, max_x, max_y))
 
-cell_size = random.choice([10, 20, 25,])
-# cell_size = random.choice([25])
+# cell_size = random.choice([10, 20, 25,])
+cell_size = random.choice([20])
 tracer_speed = 0
 # print("Cell size", cell_size)
 
@@ -499,18 +499,18 @@ def draw_maze_solution(path_coordinates, target_exit, exits_list):
 
 def find_maze_route(maze_route, list_of_all_boxes_1d, vertical_cells, horizontal_cells, target_exit, center_starting_pos, walls_list):
 
-    test = turtle.Turtle()
-    test.pencolor("red")
+    # test = turtle.Turtle()
+    # test.pencolor("red")
     visited_list = walls_list
     
     stack_list = []
     target_exit = list_of_all_boxes_1d.index(list_of_all_boxes_1d[target_exit])
     # maze_route.insert(0,(0,0))
     current_index = list_of_all_boxes_1d.index(center_starting_pos)
-    test.penup()
-    test.goto(list_of_all_boxes_1d[current_index])
-    test.pendown()
-    test.pensize(2)
+    # test.penup()
+    # test.goto(list_of_all_boxes_1d[current_index])
+    # test.pendown()
+    # test.pensize(2)
     total_blocks = horizontal_cells*vertical_cells
     print(total_blocks)
     print("starting point: ", current_index)
@@ -539,7 +539,7 @@ def find_maze_route(maze_route, list_of_all_boxes_1d, vertical_cells, horizontal
             if list_of_all_boxes_1d.index(list_of_all_boxes_1d[current_index]) not in visited_list or list_of_all_boxes_1d[current_index] in maze_route:
                 visited_list.append(list_of_all_boxes_1d.index(list_of_all_boxes_1d[current_index]))
 
-                test.goto(list_of_all_boxes_1d[current_index])
+                # test.goto(list_of_all_boxes_1d[current_index])
                 screen.update()
             # check if the index is in the stack list
             print(current_index)
