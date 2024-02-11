@@ -3,7 +3,7 @@ import random
 
 # min_x, min_y, max_x, max_y = random.choice([(
 # -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
-min_x, min_y, max_x, max_y = -100, -200, 100, 200
+min_x, min_y, max_x, max_y = -100, -100, 100, 100
 
 # print("box Size", (min_x, min_y, max_x, max_y))
 
