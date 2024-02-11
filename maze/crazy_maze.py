@@ -1,14 +1,15 @@
 import turtle
 import random
 
-# min_x, min_y, max_x, max_y = random.choice([(
-# -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
-min_x, min_y, max_x, max_y = -100, -100, 100, 100
+min_x, min_y, max_x, max_y = random.choice([(
+-100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
+# min_x, min_y, max_x, max_y = -100, -100, 100, 100
 
 # print("box Size", (min_x, min_y, max_x, max_y))
 
-# cell_size = random.choice([10, 20, 25,])
-cell_size = random.choice([20])
+cell_size = random.choice([10, 20, 25,])
+
+# cell_size = random.choice([20])
 tracer_speed = 0
 # print("Cell size", cell_size)
 
@@ -133,8 +134,8 @@ def fill_in_constraints_box(cell_size: int, min_x: int, max_y: int, vertical_cel
         list: the list of positions available.
     """
     list_of_all_boxes_1d = []
-    print("Vertical", vertical_cells)
-    print("Horizontal", horizontal_cells)
+    # print("Vertical", vertical_cells)
+    # print("Horizontal", horizontal_cells)
     t = turtle.Turtle(visible=False)
     t.speed(0)
     t.getscreen().tracer(0)
@@ -300,7 +301,22 @@ def is_maze_position_valid(position, visited_list):
     pass
 
 
-def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list):
+def create_maze(cell_size:int, min_x:int, min_y:int, max_x:int, max_y:int, list_of_all_boxes_1d:list, center_starting_blocks:list, outline_wall_pos_list:list) -> tuple:
+    """Create the maze list then draw and display the maze on the screen. 
+
+    Args:
+        cell_size (int): the size(length/steps) of each side of the square.
+        min_x (int): the minimum point on the x axis.
+        min_y (int): the minimum point on the y axis.
+        max_x (int): the maximum point on the x axis.
+        max_y (int): the maximum point on the y axis.
+        list_of_all_boxes_1d (list): a list containing the coordinates of positions of all blocks in the maze.
+        center_starting_blocks (list): a list containing the coordinates of the starting blocks.
+        outline_wall_pos_list (list): a list containing the coordinates of all the wall blocks in the maze.
+
+    Returns:
+        tuple: A tuple containing 3 lists of maze information, (exits_list:list, maze_route:list, maze_wall_list:list)
+    """
     horizontal_cells = int((-min_x + max_x) / cell_size)
     vertical_cells = int((-min_y + max_y) / cell_size)
     total_blocks = vertical_cells * horizontal_cells
@@ -319,13 +335,9 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     wall.speed(0)
     route.pen(pencolor="lawngreen", pendown=False, fillcolor="lawngreen")
     wall.penup()
-    # wall.right(90)
     wall.goto(center_starting_blocks[-1])
-    # route.right(90)
     route.goto(center_starting_blocks[-1])
     route.pendown()
-
-    # draw_square(cell_size, route, "green", "black")
 
     # Add the index of the center starting block pos in the list of all boxes to the visited list
     [visited_list.append(list_of_all_boxes_1d.index(pos))
@@ -357,8 +369,10 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
 
         if current_index not in visited_list or current_index == None and current_wall_index not in visited_list or current_wall_index == None and current_index < len(list_of_all_boxes_1d):
             # check if the  there are no more places to go
-            if len(stack) != 0:
-                pass
+            if len(stack) == 0:
+                print("No more blocks to go to, this is where i finish creating your maze.")
+                break
+
             # Drawing the path
             if current_index != None and current_index < len(list_of_all_boxes_1d) and current_index not in visited_list:
                 if current_index not in visited_list:
@@ -386,8 +400,22 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     return exits_list, maze_route, maze_wall_list
 
 
-def open_exits(route, maze_route, maze_wall_list, list_of_all_boxes_1d, horizontal_cells, vertical_cells):
+def open_exits(route:turtle, maze_route:list, maze_wall_list:list, list_of_all_boxes_1d:list, horizontal_cells:int, vertical_cells:int) -> list:
+    """Open 1 exit on each side of the maze. 
 
+    Args:
+        route (turtle): the turtle to be used to create the openings.
+        maze_route (list): a list containing only the usable path/route in the maze.
+        maze_wall_list (list): a list containing only the walls in the maze.
+        list_of_all_boxes_1d (list): a list containing the coordinates of positions of all blocks in the maze.
+        horizontal_cells (int): the number of squares that can fit in the box horizontally.
+        vertical_cells (int): the number of squares that can fit in the box vertically.
+
+    Returns:
+        list: a list containing the exit coordinates.
+    """
+
+    # TODO: Error handling for when no possible exit can be opened
     cells = horizontal_cells*vertical_cells
     exits_list = []
     # Open Top
@@ -477,6 +505,7 @@ def convert_vec2d_to_int_tuple(vec2d_list: list) -> list:
 
     return vec2d_list
 
+
 def draw_maze_solution(path_coordinates, target_exit, exits_list):
     solver = turtle.Turtle(visible=False)
     solver.penup()
@@ -497,6 +526,7 @@ def draw_maze_solution(path_coordinates, target_exit, exits_list):
             else:
                 solver.goto(path[0]+(cell_size/2), path[1])
 
+
 def find_maze_route(maze_route, list_of_all_boxes_1d, vertical_cells, horizontal_cells, target_exit, center_starting_pos, walls_list):
 
     # test = turtle.Turtle()
@@ -512,8 +542,8 @@ def find_maze_route(maze_route, list_of_all_boxes_1d, vertical_cells, horizontal
     # test.pendown()
     # test.pensize(2)
     total_blocks = horizontal_cells*vertical_cells
-    print(total_blocks)
-    print("starting point: ", current_index)
+    # print(total_blocks)
+    # print("starting point: ", current_index)
     visited_list.append(current_index)
     if current_index not in stack_list:
         stack_list.append(current_index)
@@ -542,17 +572,18 @@ def find_maze_route(maze_route, list_of_all_boxes_1d, vertical_cells, horizontal
                 # test.goto(list_of_all_boxes_1d[current_index])
                 screen.update()
             # check if the index is in the stack list
-            print(current_index)
+            # print(current_index)
             if current_index not in stack_list and list_of_all_boxes_1d[current_index] in maze_route:
                 stack_list.append(list_of_all_boxes_1d.index(list_of_all_boxes_1d[current_index]))
 
             pass
         
-    print(stack_list)
+    # print(stack_list)
         
     maze_route_pos = [list_of_all_boxes_1d[pos] for pos in stack_list]
     
     return stack_list, maze_route_pos
+
 
 def solve_maze(target_exit, maze_route, list_of_all_boxes_1d,
                    horizontal_cells, vertical_cells, center_starting_pos, walls_list):
@@ -560,13 +591,13 @@ def solve_maze(target_exit, maze_route, list_of_all_boxes_1d,
     maze_route = [list_of_all_boxes_1d[pos] for pos in maze_route]
     maze_route = [pos for pos in list_of_all_boxes_1d if pos in maze_route]
     
-    print("Target exit: ", target_exit)
+    # print("Target exit: ", target_exit)
     list_of_paths = []
     path, path_coordinates  = find_maze_route(maze_route, list_of_all_boxes_1d,
                 horizontal_cells, vertical_cells, target_exit, center_starting_pos, walls_list)
     list_of_paths.append(path)
 
-    print(path_coordinates)
+    # print(path_coordinates)
     return path_coordinates
     pass
 
@@ -579,6 +610,7 @@ def run_maze():
     screen = turtle.Screen()
     list_of_all_boxes_1d = fill_in_constraints_box(
         cell_size, min_x, max_y, vertical_cells, horizontal_cells)
+    screen.update()
 
     # print(list_of_all_boxes_1d)
 
@@ -599,8 +631,9 @@ def run_maze():
 
     # print("New List:", len(list_of_all_boxes_1d))
 
-    exits_list, maze_route, maze_wall_list = create_maze_route(cell_size, min_x, min_y, max_x, max_y,
+    exits_list, maze_route, maze_wall_list = create_maze(cell_size, min_x, min_y, max_x, max_y,
                                                list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list)
+    screen.update()
     
     target_exit = exits_list[0]
     screen.update()
