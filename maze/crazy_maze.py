@@ -3,13 +3,13 @@ import random
 
 # min_x, min_y, max_x, max_y = random.choice([(
 # -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
-min_x, min_y, max_x, max_y = -100, -100, 100, 100
+min_x, min_y, max_x, max_y = -100, -200, 100, 200
 
 # print("box Size", (min_x, min_y, max_x, max_y))
 
 # cell_size = random.choice([10, 20, 25,])
 cell_size = random.choice([25])
-
+tracer_speed = 0
 # print("Cell size", cell_size)
 
 
@@ -101,7 +101,7 @@ def draw_starting_point() -> list:
         list(tuple): a list of tuples containing coordinates.
     """
     starting = turtle.Turtle(visible=False)
-    starting.getscreen().tracer(0)
+    starting.getscreen().tracer(tracer_speed)
     center_starting_pos = []
     starting_y_point = cell_size
     for line in range(1):
@@ -158,7 +158,7 @@ def fill_in_constraints_box(cell_size: int, min_x: int, max_y: int, vertical_cel
     pass
 
 
-def choose_random_move_index(current_index: int, x_cells: int, y_cells: int, visited_list: list, stack: list) -> tuple:
+def choose_random_move_index(current_index: int, x_cells: int, y_cells: int, visited_list: list, stack: list, len_of_obs: int) -> tuple:
     """Choose a random index to move the robot to.
 
     Args:
@@ -172,7 +172,7 @@ def choose_random_move_index(current_index: int, x_cells: int, y_cells: int, vis
         tuple(int, int): a tuple containing the random index and the random wall index. 
     """
 
-    len_of_obs = (x_cells * y_cells)
+
     if current_index == None:
         current_index = 0
     # Check the first index, and choose an index to place the wall.
@@ -267,11 +267,13 @@ def choose_random_move_index(current_index: int, x_cells: int, y_cells: int, vis
                 # Do the stack reverse here
 
                 # print("going back")
-                stack.pop()
+                removed  = stack.pop()
+                while len(stack) > 1 and stack[-1] == removed:
+                    stack.pop()
                 random_index = stack[-1]
                 wall_index = None
                 break
-            elif len(stack) == 1 and all(in_visited):
+            elif len(stack) >= 1 and all(in_visited):
                 # Check is the stack only have one value, if so then there are no more possible routes start placing walls where there isn't
                 random_index = None
                 for i in range(0, len_of_obs):
@@ -301,6 +303,7 @@ def is_maze_position_valid(position, visited_list):
 def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list):
     horizontal_cells = int((-min_x + max_x) / cell_size)
     vertical_cells = int((-min_y + max_y) / cell_size)
+    total_blocks = vertical_cells * horizontal_cells
     maze_route = []
     maze_wall_list = []
     visited_list = []
@@ -309,10 +312,10 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     route = turtle.Turtle()
     route.speed(0)
     # route.getscreen().tracer(10, 5)
-    route.getscreen().tracer(0)
+    route.getscreen().tracer(tracer_speed)
     wall = turtle.Turtle()
     # wall.getscreen().tracer(10, 5)
-    wall.getscreen().tracer(0)
+    wall.getscreen().tracer(tracer_speed)
     wall.speed(0)
     route.pen(pencolor="lawngreen", pendown=False, fillcolor="lawngreen")
     wall.penup()
@@ -347,7 +350,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     while len(visited_list) < (len(list_of_all_boxes_1d)):
 
         random_index, wall_index = choose_random_move_index(
-            current_index, horizontal_cells, vertical_cells, visited_list, stack)
+            current_index, horizontal_cells, vertical_cells, visited_list, stack, total_blocks)
 
         current_index = random_index
         current_wall_index = wall_index
@@ -380,7 +383,7 @@ def create_maze_route(cell_size, min_x, min_y, max_x, max_y, list_of_all_boxes_1
     exits_list = open_exits(route, maze_route, maze_wall_list,
                             list_of_all_boxes_1d, horizontal_cells, vertical_cells)
 
-    return exits_list, maze_route
+    return exits_list, maze_route, maze_wall_list
 
 
 def open_exits(route, maze_route, maze_wall_list, list_of_all_boxes_1d, horizontal_cells, vertical_cells):
@@ -474,88 +477,103 @@ def convert_vec2d_to_int_tuple(vec2d_list: list) -> list:
 
     return vec2d_list
 
-def draw_maze_solution():
-    solver = turtle.Turtle()
+def draw_maze_solution(path_coordinates, target_exit, exits_list):
+    solver = turtle.Turtle(visible=False)
     solver.penup()
     solver.goto(-(cell_size/2), cell_size/2)
-    solver.pen(shown=True, pendown=True, pencolor="red", fillcolor="red")
-    pass
+    solver.pendown()
+    solver.pen(pencolor="blue", pensize=2, speed=10)
+    for path in path_coordinates:
+        if path != path_coordinates[-1]:
+            solver.goto(path[0]+(cell_size/2), path[1]-(cell_size/2))
+        else:
+            if target_exit == exits_list[3]:
+                solver.goto(path[0]+(cell_size), path[1]-(cell_size/2))
+                
+            elif target_exit == exits_list[2] :
+                solver.goto(path[0], path[1]-(cell_size/2))
+            elif target_exit == exits_list[1]:\
+                solver.goto(path[0]+(cell_size/2), path[1]-cell_size)
+            else:
+                solver.goto(path[0]+(cell_size/2), path[1])
 
-def find_maze_route(exits_list, maze_route, list_of_all_boxes_1d, horizontal_cells, vertical_cells, target_exit):
+def find_maze_route(maze_route, list_of_all_boxes_1d, vertical_cells, horizontal_cells, target_exit, center_starting_pos, walls_list):
 
-
-    maze_route_pos = [list_of_all_boxes_1d[pos] for pos in maze_route]
-    visited_list = []
+    test = turtle.Turtle()
+    test.pencolor("red")
+    visited_list = walls_list
+    
     stack_list = []
-
-    current_index = list_of_all_boxes_1d.index((0, 0))
+    target_exit = list_of_all_boxes_1d.index(list_of_all_boxes_1d[target_exit])
+    # maze_route.insert(0,(0,0))
+    current_index = list_of_all_boxes_1d.index(center_starting_pos)
+    test.penup()
+    test.goto(list_of_all_boxes_1d[current_index])
+    test.pendown()
+    test.pensize(2)
+    total_blocks = horizontal_cells*vertical_cells
+    print(total_blocks)
     print("starting point: ", current_index)
-
-    while len(visited_list) < len(maze_route) or current_index != target_exit:
+    visited_list.append(current_index)
+    if current_index not in stack_list:
+        stack_list.append(current_index)
+    while (len(visited_list)-len(walls_list)) != len(maze_route) or current_index != target_exit:
+        
+        if current_index == target_exit:
+            break
+       
         current_index, wall = choose_random_move_index(
-            current_index, horizontal_cells, vertical_cells, visited_list, stack_list)
+            current_index, horizontal_cells, vertical_cells, visited_list, stack_list, total_blocks)
+        
+        if current_index == None:
+            current_index = list_of_all_boxes_1d.index(center_starting_pos)
+        
+        if current_index > total_blocks:
+            continue
 
-        if current_index not in visited_list or current_index != None and current_index < len(maze_route):
+        if (list_of_all_boxes_1d[current_index] in maze_route) and (list_of_all_boxes_1d.index(list_of_all_boxes_1d[current_index]) not in visited_list or current_index != None) and current_index < total_blocks:
+            
+            # print(current_index)
+            
             # check if the index is in the list of visited indexes
-            if current_index not in visited_list:
-                visited_list.append(list_of_all_boxes_1d[current_index])
+            if list_of_all_boxes_1d.index(list_of_all_boxes_1d[current_index]) not in visited_list or list_of_all_boxes_1d[current_index] in maze_route:
+                visited_list.append(list_of_all_boxes_1d.index(list_of_all_boxes_1d[current_index]))
 
+                test.goto(list_of_all_boxes_1d[current_index])
+                screen.update()
             # check if the index is in the stack list
-            if current_index not in stack_list:
-                stack_list.append(list_of_all_boxes_1d[current_index])
+            print(current_index)
+            if current_index not in stack_list and list_of_all_boxes_1d[current_index] in maze_route:
+                stack_list.append(list_of_all_boxes_1d.index(list_of_all_boxes_1d[current_index]))
 
             pass
+        
+    print(stack_list)
+        
+    maze_route_pos = [list_of_all_boxes_1d[pos] for pos in stack_list]
     
     return stack_list, maze_route_pos
 
-def solve_maze(exits_list, maze_route, list_of_all_boxes_1d,
-                   horizontal_cells, vertical_cells):
-    target_exit = exits_list[0]
+def solve_maze(target_exit, maze_route, list_of_all_boxes_1d,
+                   horizontal_cells, vertical_cells, center_starting_pos, walls_list):
+    
+    maze_route = [list_of_all_boxes_1d[pos] for pos in maze_route]
+    maze_route = [pos for pos in list_of_all_boxes_1d if pos in maze_route]
+    
     print("Target exit: ", target_exit)
     list_of_paths = []
-    for i in range(4):
-        path, path_coordinates  = find_maze_route(exits_list, maze_route, list_of_all_boxes_1d,
-                   horizontal_cells, vertical_cells, target_exit)
-        list_of_paths.append(path)
-    print()
-    print("Iteration 1 list of paths: ")
-    [print(f'{index}:', path) for index,path in enumerate(list_of_paths)]
-    print()
+    path, path_coordinates  = find_maze_route(maze_route, list_of_all_boxes_1d,
+                horizontal_cells, vertical_cells, target_exit, center_starting_pos, walls_list)
+    list_of_paths.append(path)
+
     print(path_coordinates)
-    
-    # shortest_path = list_of_paths[0]
-    # for path in list_of_paths:
-    #     if len(path) < len(shortest_path):
-    #         shortest_path = path
-            
-    # print("Iteration 1 list of paths: ")
-    # [print(f'{index}:', path) for index,path in enumerate(list_of_paths)]
-    
-    # print()
-    # print()
-    # list_of_paths = []   
-    # for j in range(4):
-    #     path, path_coordinates  = find_maze_route(exits_list, shortest_path, list_of_all_boxes_1d,
-    #                horizontal_cells, vertical_cells, target_exit)
-    #     list_of_paths.append(path)    
-
-    # print()
-    # print("Iteration 2 list of paths: ")
-    # [print(f'{index}:', path) for index,path in enumerate(list_of_paths)]
-    # print()
-    
-    # shortest_path = list_of_paths[0]
-    # for path in list_of_paths:
-    #     if len(path) < len(shortest_path):
-    #         shortest_path = path
-    # print("Iteration 2 shortest path: ", len(shortest_path), shortest_path)
-    pass
-
+    return path_coordinates
     pass
 
 
 def run_maze():
     # global vertical_cells, horizontal_cells
+    global screen
     vertical_cells = int((-min_x + max_x) / cell_size)
     horizontal_cells = int((-min_y + max_y) / cell_size)
     screen = turtle.Screen()
@@ -581,13 +599,19 @@ def run_maze():
 
     # print("New List:", len(list_of_all_boxes_1d))
 
-    exits_list, maze_route = create_maze_route(cell_size, min_x, min_y, max_x, max_y,
+    exits_list, maze_route, maze_wall_list = create_maze_route(cell_size, min_x, min_y, max_x, max_y,
                                                list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list)
+    
+    target_exit = exits_list[0]
     screen.update()
     
-    solve_maze(exits_list, maze_route, list_of_all_boxes_1d,
-                   horizontal_cells, vertical_cells)
+    path_coordinates = solve_maze(target_exit, maze_route, list_of_all_boxes_1d,
+                   horizontal_cells, vertical_cells, center_starting_blocks[-1], maze_wall_list)
     screen.update()
+    
+    draw_maze_solution(path_coordinates, target_exit, exits_list)
+    screen.update()
+    
 
     screen.exitonclick()
 
