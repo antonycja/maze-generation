@@ -1,12 +1,15 @@
 from sys import argv
 from maze.obstacles import *
+from import_helper import dynamic_import
 # from world.text.world import *
 min_y, max_y = -200, 200
 min_x, max_x = -100, 100
-if argv[-1].lower() == "turtle":
+if len(argv) == 2 and argv[1].lower() == "turtle":
     from world.turtle.world import *
-    # setup_box(min_x, min_y, max_x, max_y)
-    
+elif len(argv) == 3:
+    maze = dynamic_import("maze." + argv[-1])
+    pass
+    # setup_box(min_x, min_y, max_x, max_y)  
 else:
     from world.text.world import *
     
