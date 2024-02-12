@@ -4,17 +4,24 @@ from import_helper import dynamic_import
 # from world.text.world import *
 min_y, max_y = -200, 200
 min_x, max_x = -100, 100
+if len(argv) <= 2:
+    maze_name = "obstacles"
+    pass
 if len(argv) == 2 and argv[1].lower() == "turtle":
     from world.turtle.world import *
+
 elif len(argv) == 3:
-    maze = dynamic_import("maze." + argv[-1])
+    maze_name = argv[-1]
+    maze = dynamic_import("maze." + maze_name)
     pass
-    # setup_box(min_x, min_y, max_x, max_y)  
+    # setup_box(min_x, min_y, max_x, max_y)
 else:
     from world.text.world import *
-    
+    maze_name = "obstacles"
+
 # else:
 #     from world.text.world import *
+
 
 def get_robot_name() -> tuple:  # Returns the name of the robot
     """Gets the name of the robot from the user and greets the user.
@@ -27,7 +34,7 @@ def get_robot_name() -> tuple:  # Returns the name of the robot
     return name, greet
 
 
-def get_action(robot_name: str, commands: dict, position: dict, direction: int, list_keys: list, movement_commands: list, movement_history: list, obstacles_list:list) -> str:
+def get_action(robot_name: str, commands: dict, position: dict, direction: int, list_keys: list, movement_commands: list, movement_history: list, obstacles_list: list) -> str:
     """Get the next action for the robot to do, check if the command is valid and do the action. Retry until a valid command is given.
 
     Args:
@@ -64,6 +71,17 @@ def get_action(robot_name: str, commands: dict, position: dict, direction: int, 
         get_action(robot_name, commands, position, direction,
                    list_keys, movement_commands, movement_history, obstacles_list)
 
+    elif "mazerun" in action.lower().split():
+        print(f"> {robot_name} starting maze run..")
+        if len(action.lower().split()) > 1:
+            # TODO: solve a full maze
+            pass
+        else:
+            
+            pass
+        get_action(robot_name, commands, position, direction,
+                   list_keys, movement_commands, movement_history, obstacles_list)
+
     else:
 
         movement_history = record_history(
@@ -83,7 +101,7 @@ def get_action(robot_name: str, commands: dict, position: dict, direction: int, 
     return action
 
 
-def move_forward(steps: int, name: str, position: dict, direction: int, formula: int, obstacles_list:list) -> dict:
+def move_forward(steps: int, name: str, position: dict, direction: int, formula: int, obstacles_list: list) -> dict:
     """Move the robot forward (x) amount of steps making sure that the robot does not go over the safe zone and keeping track of its position after every move.
 
     Args:
@@ -97,7 +115,7 @@ def move_forward(steps: int, name: str, position: dict, direction: int, formula:
     """
 
     move_text = None
-    if is_position_allowed(formula,position, steps, min_x, min_y, max_x, max_y):
+    if is_position_allowed(formula, position, steps, min_x, min_y, max_x, max_y):
         if is_path_blocked(formula, steps, position["x"], position["y"], obstacles_list):
             output(name, f"Sorry, there is an obstacle in the way.")
         else:
@@ -111,7 +129,7 @@ def move_forward(steps: int, name: str, position: dict, direction: int, formula:
     return position, move_text, position_text
 
 
-def move_back(steps: int, name: str, position: dict, direction: dict, formula: int, obstacles_list:list) -> dict:
+def move_back(steps: int, name: str, position: dict, direction: dict, formula: int, obstacles_list: list) -> dict:
     """Move the robot back (x) amount of steps.
 
     Args:
@@ -137,7 +155,7 @@ def move_back(steps: int, name: str, position: dict, direction: dict, formula: i
     return position, move_text, position_text
 
 
-def sprint(steps: int, name: str, position: dict, direction: dict, sprint_moves_list: list, formula:int, obstacles_list:list) -> tuple:
+def sprint(steps: int, name: str, position: dict, direction: dict, sprint_moves_list: list, formula: int, obstacles_list: list) -> tuple:
     """Sprints the robot from the given number down to the 1.
 
     Args:
@@ -235,7 +253,7 @@ def record_history(movement_commands: list, command: str, movement_history: list
     return movement_history
 
 
-def replay(robot_name: str, movement_history: list, position: dict, direction: int, command: str, move_text: str, position_text: str, sprint_moves_list: list, obstacles_list:list) -> None:
+def replay(robot_name: str, movement_history: list, position: dict, direction: int, command: str, move_text: str, position_text: str, sprint_moves_list: list, obstacles_list: list) -> None:
     """Replay the commands that the robot previously played in different ways, such as in "reverse", "silent", etc.
 
     Args:
@@ -328,7 +346,7 @@ def move(action: str, name: str, position: dict, direction: dict, move_text, pos
             steps, name, position, direction, formula, obstacles_list)
     elif "sprint" in action.lower():
         position, move_text, position_text = sprint(
-            steps, name, position, direction, sprint_moves_list, formula,obstacles_list)
+            steps, name, position, direction, sprint_moves_list, formula, obstacles_list)
 
     elif "back" in action.lower():
         position, move_text, position_text = move_back(
@@ -346,7 +364,8 @@ def robot_start():
                 "RIGHT": "Turn the robot right(90 degrees)",
                 "LEFT": "Turn the robot left(90 degrees)",
                 "SPRINT (x)": "Make the robot sprint for the sum of all steps for x to 1",
-                "REPLAY": "Filter out all non-movement commands and redo only the movement commands, providing the full output"}
+                "REPLAY": "Filter out all non-movement commands and redo only the movement commands, providing the full output",
+                "MAZERUN": "Find a way out of the maze."}
 
     movement_commands = ["forward", "back", "left", "right", "sprint"]
     # global obstacles_list
@@ -354,12 +373,20 @@ def robot_start():
     direction = 0
     list_keys = [key.split()[0] for key in commands.keys()]
     movement_history = []
-    try:
-        obstacles_list = setup_box(min_x, min_y, max_x, max_y)
-    except NameError:
-        obstacles_list = get_obstacles(min_x, min_y, max_x, max_y)
+    if maze_name != "obstacles":
+        # Call the maze algo here
+        #
+        pass
+    
+    else:        
+        try:
+            obstacles_list = setup_box(min_x, min_y, max_x, max_y)
+        except NameError:
+            obstacles_list = get_obstacles(min_x, min_y, max_x, max_y)
+        
     name, greet = get_robot_name()
-    output(message=greet)
+    print(greet)
+    print(f"{name}: Loaded {maze_name}.")
     if len(obstacles_list) > 0:
         observations(obstacles_list, name)
     get_action(name, commands, position, direction,

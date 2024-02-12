@@ -54,7 +54,7 @@ def is_path_blocked(formula, steps, x1, y1, obstacle_pos_list):
 
 
 def observations(obstacle_pos_list, robot_name):
-    print(f"{robot_name}: Loaded obstacles.")
+    # print(f"{robot_name}: Loaded obstacles.")
     print("There are some obstacles:")
     [print(f"- At position {pos[0]},{pos[1]} (to {pos[0]+4},{pos[1]+4})")
      for pos in obstacle_pos_list]

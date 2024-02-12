@@ -1,6 +1,6 @@
 import turtle
 import random
-from maze_solver import *
+from .maze_solver import *
 
 min_x, min_y, max_x, max_y = random.choice([(
 -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
@@ -550,9 +550,10 @@ def run_maze():
     draw_maze_solution(path_coordinates, target_exit, exits_list, cell_size, turtle)
     screen.update()
     
+    
 
     screen.exitonclick()
 
 
-if __name__ == "__main__":
-    run_maze()
+# if __name__ == "__main__":
+#     run_maze()
