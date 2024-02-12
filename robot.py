@@ -75,9 +75,18 @@ def get_action(robot_name: str, commands: dict, position: dict, direction: int, 
         print(f"> {robot_name} starting maze run..")
         if len(action.lower().split()) > 1:
             # TODO: solve a full maze
+            
+            if "top" in action.lower().split():
+                print("I am at the top edge.")
+            elif "right" in action.lower().split():
+                print("I am at the right edge")
+            elif "left" in action.lower().split():
+                print("I am at the left edge")
+            else:
+                print("I am at the bottom edge")
             pass
         else:
-            
+            print("I am at the top edge.")
             pass
         get_action(robot_name, commands, position, direction,
                    list_keys, movement_commands, movement_history, obstacles_list)
