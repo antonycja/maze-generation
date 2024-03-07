@@ -13,6 +13,10 @@ if len(argv) == 2 and argv[1].lower() == "turtle":
 elif len(argv) == 3:
     maze_name = argv[-1]
     maze = dynamic_import("maze." + maze_name)
+    cell_size = random.choice([10, 20, 25,])
+    exits_list, maze_route, maze_wall_list, vertical_cells, horizontal_cells, list_of_all_boxes_1d, center_starting_blocks = maze.make_maze(
+        cell_size, min_x, min_y, max_x, max_y)
+
     pass
     # setup_box(min_x, min_y, max_x, max_y)
 else:
@@ -75,7 +79,7 @@ def get_action(robot_name: str, commands: dict, position: dict, direction: int, 
         print(f"> {robot_name} starting maze run..")
         if len(action.lower().split()) > 1:
             # TODO: solve a full maze
-            
+
             if "top" in action.lower().split():
                 print("I am at the top edge.")
             elif "right" in action.lower().split():
@@ -386,13 +390,13 @@ def robot_start():
         # Call the maze algo here
         #
         pass
-    
-    else:        
+
+    else:
         try:
             obstacles_list = setup_box(min_x, min_y, max_x, max_y)
         except NameError:
             obstacles_list = get_obstacles(min_x, min_y, max_x, max_y)
-        
+
     name, greet = get_robot_name()
     print(greet)
     print(f"{name}: Loaded {maze_name}.")
