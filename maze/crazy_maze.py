@@ -3,7 +3,7 @@ import random
 from .maze_solver import *
 
 min_x, min_y, max_x, max_y = random.choice([(
--100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
+    -100, -100, 100, 100), (-200, -100, 200, 100), (-100, -200, 100, 200), (-500, -300, 500, 300)])
 # min_x, min_y, max_x, max_y = -100, -100, 100, 100
 
 # print("box Size", (min_x, min_y, max_x, max_y))
@@ -174,7 +174,6 @@ def choose_random_move_index(current_index: int, x_cells: int, y_cells: int, vis
         tuple(int, int): a tuple containing the random index and the random wall index. 
     """
 
-
     if current_index == None:
         current_index = 0
     # Check the first index, and choose an index to place the wall.
@@ -269,7 +268,7 @@ def choose_random_move_index(current_index: int, x_cells: int, y_cells: int, vis
                 # Do the stack reverse here
 
                 # print("going back")
-                removed  = stack.pop()
+                removed = stack.pop()
                 while len(stack) > 1 and stack[-1] == removed:
                     stack.pop()
                 random_index = stack[-1]
@@ -299,10 +298,49 @@ def is_maze_position_valid(position, visited_list):
         return False
         pass
 
+
+def make_maze(cell_size, min_x: int, min_y: int, max_x: int, max_y: int,):
+    global screen
+    vertical_cells = int((-min_x + max_x) / cell_size)
+    horizontal_cells = int((-min_y + max_y) / cell_size)
+
+    list_of_all_boxes_1d = fill_in_constraints_box(
+        cell_size, min_x, max_y, vertical_cells, horizontal_cells)
+
+    screen.update()
+
+    list_of_all_boxes_1d = convert_vec2d_to_int_tuple(list_of_all_boxes_1d)
+
+    center_starting_blocks = draw_starting_point()
+    screen.update()
+
+    center_starting_blocks = convert_vec2d_to_int_tuple(center_starting_blocks)
+
+    outline_wall_pos_list = draw_constraint_box(min_x, min_y, max_x, max_y)
+    screen.update()
+
+    exits_list, maze_route, maze_wall_list = create_maze(cell_size, min_x, min_y, max_x, max_y,
+                                                         list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list)
+
+    screen.update()
+    screen.exitonclick()
+
+    return exits_list, maze_route, maze_wall_list, vertical_cells, horizontal_cells, list_of_all_boxes_1d, center_starting_blocks
+
+
+def draw_solution(exits_list, target_exit, maze_route, list_of_all_boxes_1d,
+                  horizontal_cells, vertical_cells, center_starting_blocks, maze_wall_list):
+    path_coordinates = solve_maze(target_exit, maze_route, list_of_all_boxes_1d,
+                                  horizontal_cells, vertical_cells, center_starting_blocks[-1], maze_wall_list, choose_random_move_index, screen)
+    screen.update()
+
+    draw_maze_solution(path_coordinates, target_exit,
+                       exits_list, cell_size, turtle)
+    screen.update()
     pass
 
 
-def create_maze(cell_size:int, min_x:int, min_y:int, max_x:int, max_y:int, list_of_all_boxes_1d:list, center_starting_blocks:list, outline_wall_pos_list:list) -> tuple:
+def create_maze(cell_size: int, min_x: int, min_y: int, max_x: int, max_y: int, list_of_all_boxes_1d: list, center_starting_blocks: list, outline_wall_pos_list: list) -> tuple:
     """Create the maze list then draw and display the maze on the screen. 
 
     Args:
@@ -371,7 +409,8 @@ def create_maze(cell_size:int, min_x:int, min_y:int, max_x:int, max_y:int, list_
         if current_index not in visited_list or current_index == None and current_wall_index not in visited_list or current_wall_index == None and current_index < len(list_of_all_boxes_1d):
             # check if the  there are no more places to go
             if len(stack) == 0:
-                print("No more blocks to go to, this is where i finish creating your maze.")
+                print(
+                    "No more blocks to go to, this is where i finish creating your maze.")
                 break
 
             # Drawing the path
@@ -401,7 +440,7 @@ def create_maze(cell_size:int, min_x:int, min_y:int, max_x:int, max_y:int, list_
     return exits_list, maze_route, maze_wall_list
 
 
-def open_exits(route:turtle, maze_route:list, maze_wall_list:list, list_of_all_boxes_1d:list, horizontal_cells:int, vertical_cells:int) -> list:
+def open_exits(route: turtle, maze_route: list, maze_wall_list: list, list_of_all_boxes_1d: list, horizontal_cells: int, vertical_cells: int) -> list:
     """Open 1 exit on each side of the maze. 
 
     Args:
@@ -509,50 +548,50 @@ def convert_vec2d_to_int_tuple(vec2d_list: list) -> list:
 
 def run_maze():
     # global vertical_cells, horizontal_cells
-    global screen
-    vertical_cells = int((-min_x + max_x) / cell_size)
-    horizontal_cells = int((-min_y + max_y) / cell_size)
-    screen = turtle.Screen()
-    list_of_all_boxes_1d = fill_in_constraints_box(
-        cell_size, min_x, max_y, vertical_cells, horizontal_cells)
-    screen.update()
+    # global screen
+    # vertical_cells = int((-min_x + max_x) / cell_size)
+    # horizontal_cells = int((-min_y + max_y) / cell_size)
+    # screen = turtle.Screen()
+    # list_of_all_boxes_1d = fill_in_constraints_box(
+    #     cell_size, min_x, max_y, vertical_cells, horizontal_cells)
+    # screen.update()
 
-    # print(list_of_all_boxes_1d)
+    # # print(list_of_all_boxes_1d)
 
-    # list_of_all_boxes_1d = [((box[0]), int(box[1])) for box in list_of_all_boxes_1d]
-    list_of_all_boxes_1d = convert_vec2d_to_int_tuple(list_of_all_boxes_1d)
+    # # list_of_all_boxes_1d = [((box[0]), int(box[1])) for box in list_of_all_boxes_1d]
+    # list_of_all_boxes_1d = convert_vec2d_to_int_tuple(list_of_all_boxes_1d)
 
-    # print(list_of_all_boxes_1d)
-    # print(len(list_of_all_boxes_1d))
+    # # print(list_of_all_boxes_1d)
+    # # print(len(list_of_all_boxes_1d))
 
-    center_starting_blocks = draw_starting_point()
-    screen.update()
+    # center_starting_blocks = draw_starting_point()
+    # screen.update()
 
-    # center_starting_blocks = [(int(box[0]), int(box[0]) ) for box in center_starting_blocks]
-    center_starting_blocks = convert_vec2d_to_int_tuple(center_starting_blocks)
+    # # center_starting_blocks = [(int(box[0]), int(box[0]) ) for box in center_starting_blocks]
+    # center_starting_blocks = convert_vec2d_to_int_tuple(center_starting_blocks)
 
-    outline_wall_pos_list = draw_constraint_box(min_x, min_y, max_x, max_y)
-    screen.update()
+    # outline_wall_pos_list = draw_constraint_box(min_x, min_y, max_x, max_y)
+    # screen.update()
 
     # print("New List:", len(list_of_all_boxes_1d))
 
-    exits_list, maze_route, maze_wall_list = create_maze(cell_size, min_x, min_y, max_x, max_y,
-                                               list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list)
-    screen.update()
-    
-    target_exit = exits_list[0]
-    screen.update()
-    
-    path_coordinates = solve_maze(target_exit, maze_route, list_of_all_boxes_1d,
-                   horizontal_cells, vertical_cells, center_starting_blocks[-1], maze_wall_list, choose_random_move_index, screen)
-    screen.update()
-    
-    draw_maze_solution(path_coordinates, target_exit, exits_list, cell_size, turtle)
-    screen.update()
-    
-    
+    # exits_list, maze_route, maze_wall_list = create_maze(cell_size, min_x, min_y, max_x, max_y,
+    #                                                      list_of_all_boxes_1d, center_starting_blocks, outline_wall_pos_list)
+    # screen.update()
 
-    screen.exitonclick()
+    # target_exit = exits_list[0]
+    # screen.update()
+
+    # path_coordinates = solve_maze(target_exit, maze_route, list_of_all_boxes_1d,
+    #                               horizontal_cells, vertical_cells, center_starting_blocks[-1], maze_wall_list, choose_random_move_index, screen)
+    # screen.update()
+
+    # draw_maze_solution(path_coordinates, target_exit,
+    #                    exits_list, cell_size, turtle)
+    # screen.update()
+
+    # screen.exitonclick()
+    pass
 
 
 # if __name__ == "__main__":
